@@ -1,0 +1,39 @@
+{
+  "name": "md-to-pdf-lite",
+  "version": "1.0.0",
+  "description": "Ultra-lightweight, zero-chromium-bundle Markdown to PDF converter with CJK typography, KaTeX, and CI/CD support.",
+  "main": "src/index.js",
+  "bin": {
+    "md-to-pdf-lite": "bin/cli.js",
+    "md2pdf-lite": "bin/cli.js"
+  },
+  "keywords": [
+    "markdown",
+    "pdf",
+    "markdown-to-pdf",
+    "md-to-pdf",
+    "cjk",
+    "katex",
+    "cli",
+    "puppeteer-core",
+    "lightweight"
+  ],
+  "author": "ajaxsys",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "node test/run-tests.js"
+  },
+  "dependencies": {
+    "@vscode/markdown-it-katex": "^1.1.2",
+    "commander": "^13.1.0",
+    "highlight.js": "^11.11.1",
+    "katex": "^0.16.21",
+    "markdown-it": "^14.1.0",
+    "picocolors": "^1.1.1",
+    "puppeteer-core": "^24.4.0"
+  }
+}
