@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+const url = require('url');
 const puppeteer = require('puppeteer-core');
 const { parseMarkdown } = require('./markdown-parser');
 const { findChromeExecutable } = require('./chrome-finder');
@@ -54,18 +56,6 @@ function escapeHtml(str) {
 
 /**
  * Core conversion function: converts Markdown string or file to PDF.
- * 
- * @param {Object} params
- * @param {string} [params.markdown] - Raw markdown text
- * @param {string} [params.input] - Input markdown file path
- * @param {string} [params.output] - Output PDF file path
- * @param {string} [params.executablePath] - Custom Chrome/Chromium binary path
- * @param {string} [params.format='A4'] - Paper format (A4, Letter, etc.)
- * @param {Object} [params.margin] - Margins object: { top, right, bottom, left }
- * @param {string} [params.css] - Custom inline CSS
- * @param {string} [params.stylesheet] - Custom external CSS file path
- * @param {boolean} [params.landscape=false] - Landscape orientation
- * @returns {Promise<{ pdfPath?: string, buffer?: Buffer }>}
  */
 async function convert(params = {}) {
   let markdownText = params.markdown || '';
@@ -95,7 +85,7 @@ async function convert(params = {}) {
     );
   }
 
-  // 2. Parse Markdown
+  // 2. Parse Markdown (with automatic local image inlining)
   const htmlContent = parseMarkdown(markdownText, { baseDir });
   const title = params.title || (params.input ? path.basename(params.input, path.extname(params.input)) : 'Document');
   const fullHtml = buildHtmlDocument(htmlContent, {
@@ -103,6 +93,13 @@ async function convert(params = {}) {
     css: params.css,
     stylesheet: params.stylesheet
   });
+
+  // Write temporary HTML file to guarantee proper origin for local assets
+  const tmpHtmlPath = path.join(
+    os.tmpdir(),
+    `md-to-pdf-${Date.now()}-${Math.random().toString(36).slice(2)}.html`
+  );
+  fs.writeFileSync(tmpHtmlPath, fullHtml, 'utf8');
 
   // 3. Launch Puppeteer with host Chrome
   const browser = await puppeteer.launch({
@@ -114,7 +111,9 @@ async function convert(params = {}) {
       '--disable-gpu',
       '--disable-dev-shm-usage',
       '--no-first-run',
-      '--no-zygote'
+      '--no-zygote',
+      '--allow-file-access-from-files',
+      '--disable-web-security'
     ]
   });
 
@@ -126,7 +125,9 @@ async function convert(params = {}) {
       try { await dialog.dismiss(); } catch {}
     });
 
-    await page.setContent(fullHtml, {
+    // Navigate to temp HTML file via file:// URL
+    const fileUrl = url.pathToFileURL(tmpHtmlPath).href;
+    await page.goto(fileUrl, {
       waitUntil: 'networkidle0',
       timeout: 30000
     });
@@ -157,6 +158,11 @@ async function convert(params = {}) {
       return { buffer };
     }
   } finally {
+    try {
+      if (fs.existsSync(tmpHtmlPath)) {
+        fs.unlinkSync(tmpHtmlPath);
+      }
+    } catch {}
     await browser.close();
   }
 }

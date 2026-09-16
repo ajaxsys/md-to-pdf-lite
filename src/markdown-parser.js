@@ -1,7 +1,20 @@
+const fs = require('fs');
 const path = require('path');
+const url = require('url');
 const MarkdownIt = require('markdown-it');
 const markdownItKatex = require('@vscode/markdown-it-katex').default || require('@vscode/markdown-it-katex');
 const hljs = require('highlight.js');
+
+const MIME_TYPES = {
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.webp': 'image/webp',
+  '.bmp': 'image/bmp',
+  '.ico': 'image/x-icon'
+};
 
 /**
  * Creates and configures a Markdown parser.
@@ -34,7 +47,8 @@ function createParser(options = {}) {
     strict: 'ignore'
   });
 
-  // Custom renderer for relative image paths -> file:// URI
+  // Custom renderer for images: automatically inlines local images as base64 Data URLs
+  // This completely eliminates Chrome local resource security restrictions (CORS/file:// blocks)
   const defaultImageRender = md.renderer.rules.image || function (tokens, idx, options, env, self) {
     return self.renderToken(tokens, idx, options);
   };
@@ -43,11 +57,31 @@ function createParser(options = {}) {
     const token = tokens[idx];
     const srcIndex = token.attrIndex('src');
     if (srcIndex >= 0) {
-      let src = token.attrs[srcIndex][1];
-      // Convert local relative file paths to absolute file:// URLs
-      if (!src.startsWith('http://') && !src.startsWith('https://') && !src.startsWith('data:') && !src.startsWith('file://')) {
-        const absolutePath = path.resolve(baseDir, src);
-        token.attrs[srcIndex][1] = 'file://' + absolutePath;
+      const rawSrc = token.attrs[srcIndex][1];
+      if (!rawSrc.startsWith('http://') && !rawSrc.startsWith('https://') && !rawSrc.startsWith('data:')) {
+        let localPath = rawSrc;
+        if (rawSrc.startsWith('file://')) {
+          try {
+            localPath = url.fileURLToPath(rawSrc);
+          } catch {
+            localPath = rawSrc.replace(/^file:\/\//, '');
+          }
+        } else {
+          localPath = path.isAbsolute(rawSrc) ? rawSrc : path.resolve(baseDir, rawSrc);
+        }
+
+        if (fs.existsSync(localPath)) {
+          try {
+            const ext = path.extname(localPath).toLowerCase();
+            const mime = MIME_TYPES[ext] || 'image/png';
+            const base64 = fs.readFileSync(localPath).toString('base64');
+            token.attrs[srcIndex][1] = `data:${mime};base64,${base64}`;
+          } catch (err) {
+            token.attrs[srcIndex][1] = url.pathToFileURL(localPath).href;
+          }
+        } else {
+          token.attrs[srcIndex][1] = url.pathToFileURL(localPath).href;
+        }
       }
     }
     return defaultImageRender(tokens, idx, options, env, self);
