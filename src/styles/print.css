@@ -41,3 +41,9 @@
     max-height: 95vh;
   }
 }
+
+/* Prevent wide KaTeX equations from triggering document-level shrink-to-fit */
+.katex-display {
+  font-size: 0.88em;
+  max-width: 100%;
+}
