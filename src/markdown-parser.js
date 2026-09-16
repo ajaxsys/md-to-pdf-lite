@@ -17,11 +17,43 @@ const MIME_TYPES = {
 };
 
 /**
+ * Inlines local images (both markdown ![] and raw <img> tags) to Base64 Data URLs.
+ * This completely avoids any browser local file restrictions (CORS/file:// security blocks).
+ */
+function inlineAllLocalImages(html, baseDir) {
+  return html.replace(/<img\b([^>]*?)\bsrc=["']([^"']+)["']([^>]*?)>/gi, (match, prefix, rawSrc, suffix) => {
+    if (rawSrc.startsWith('http://') || rawSrc.startsWith('https://') || rawSrc.startsWith('data:')) {
+      return match;
+    }
+    let localPath = rawSrc;
+    if (rawSrc.startsWith('file://')) {
+      try {
+        localPath = url.fileURLToPath(rawSrc);
+      } catch {
+        localPath = rawSrc.replace(/^file:\/\//, '');
+      }
+    } else {
+      localPath = path.isAbsolute(rawSrc) ? rawSrc : path.resolve(baseDir, rawSrc);
+    }
+
+    if (fs.existsSync(localPath)) {
+      try {
+        const ext = path.extname(localPath).toLowerCase();
+        const mime = MIME_TYPES[ext] || 'image/png';
+        const base64 = fs.readFileSync(localPath).toString('base64');
+        return `<img${prefix}src="data:${mime};base64,${base64}"${suffix}>`;
+      } catch {
+        return match;
+      }
+    }
+    return match;
+  });
+}
+
+/**
  * Creates and configures a Markdown parser.
  */
-function createParser(options = {}) {
-  const baseDir = options.baseDir || process.cwd();
-
+function createParser() {
   const md = new MarkdownIt({
     html: true,
     linkify: true,
@@ -47,46 +79,6 @@ function createParser(options = {}) {
     strict: 'ignore'
   });
 
-  // Custom renderer for images: automatically inlines local images as base64 Data URLs
-  // This completely eliminates Chrome local resource security restrictions (CORS/file:// blocks)
-  const defaultImageRender = md.renderer.rules.image || function (tokens, idx, options, env, self) {
-    return self.renderToken(tokens, idx, options);
-  };
-
-  md.renderer.rules.image = function (tokens, idx, options, env, self) {
-    const token = tokens[idx];
-    const srcIndex = token.attrIndex('src');
-    if (srcIndex >= 0) {
-      const rawSrc = token.attrs[srcIndex][1];
-      if (!rawSrc.startsWith('http://') && !rawSrc.startsWith('https://') && !rawSrc.startsWith('data:')) {
-        let localPath = rawSrc;
-        if (rawSrc.startsWith('file://')) {
-          try {
-            localPath = url.fileURLToPath(rawSrc);
-          } catch {
-            localPath = rawSrc.replace(/^file:\/\//, '');
-          }
-        } else {
-          localPath = path.isAbsolute(rawSrc) ? rawSrc : path.resolve(baseDir, rawSrc);
-        }
-
-        if (fs.existsSync(localPath)) {
-          try {
-            const ext = path.extname(localPath).toLowerCase();
-            const mime = MIME_TYPES[ext] || 'image/png';
-            const base64 = fs.readFileSync(localPath).toString('base64');
-            token.attrs[srcIndex][1] = `data:${mime};base64,${base64}`;
-          } catch (err) {
-            token.attrs[srcIndex][1] = url.pathToFileURL(localPath).href;
-          }
-        } else {
-          token.attrs[srcIndex][1] = url.pathToFileURL(localPath).href;
-        }
-      }
-    }
-    return defaultImageRender(tokens, idx, options, env, self);
-  };
-
   return md;
 }
 
@@ -103,22 +95,28 @@ function preprocessMarkdown(text) {
 }
 
 /**
- * Parse Markdown to HTML string with custom options.
+ * Parse Markdown to HTML string with custom options and base64 local image inlining.
  */
 function parseMarkdown(markdownText, options = {}) {
-  const md = createParser(options);
+  const baseDir = options.baseDir || process.cwd();
+  const md = createParser();
   const preprocessed = preprocessMarkdown(markdownText);
   const origWarn = console.warn;
   console.warn = () => {};
+  let html = '';
   try {
-    return md.render(preprocessed);
+    html = md.render(preprocessed);
   } finally {
     console.warn = origWarn;
   }
+
+  // Inline all local images (both markdown syntax and raw <img> tags)
+  return inlineAllLocalImages(html, baseDir);
 }
 
 module.exports = {
   createParser,
   preprocessMarkdown,
-  parseMarkdown
+  parseMarkdown,
+  inlineAllLocalImages
 };
