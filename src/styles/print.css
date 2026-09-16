@@ -30,6 +30,10 @@
     break-after: avoid !important;
   }
 
+  table {
+    width: calc(100% - 2px) !important;
+  }
+
   tr, pre, blockquote, .katex-display {
     page-break-inside: avoid !important;
     break-inside: avoid !important;

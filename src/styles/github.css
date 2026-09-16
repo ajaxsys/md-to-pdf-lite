@@ -1,4 +1,8 @@
 /* Modern GitHub-like Markdown Typography with CJK Optimization */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root {
   --font-cjk: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans CJK JP", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -91,10 +95,9 @@ table {
   border-spacing: 0;
   border-collapse: collapse;
   display: table;
-  width: 100%;
+  width: calc(100% - 2px);
   margin-top: 0;
   margin-bottom: 16px;
-  overflow: auto;
 }
 
 table th {
