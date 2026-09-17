@@ -6,13 +6,18 @@ const puppeteer = require('puppeteer-core');
 const { parseMarkdown } = require('./markdown-parser');
 const { findChromeExecutable } = require('./chrome-finder');
 
-// Cache builtin CSS files
+// Cache builtin CSS files and vendor scripts
 const baseStyles = {
   github: fs.readFileSync(path.join(__dirname, 'styles/github.css'), 'utf8'),
   print: fs.readFileSync(path.join(__dirname, 'styles/print.css'), 'utf8'),
   highlight: fs.readFileSync(require.resolve('highlight.js/styles/github.css'), 'utf8'),
   katex: fs.readFileSync(require.resolve('katex/dist/katex.min.css'), 'utf8')
 };
+
+const mermaidScriptPath = path.join(__dirname, 'vendor/mermaid.min.js');
+const mermaidScript = fs.existsSync(mermaidScriptPath)
+  ? fs.readFileSync(mermaidScriptPath, 'utf8')
+  : '';
 
 /**
  * Builds a complete standalone HTML document string from markdown HTML content.
@@ -24,6 +29,27 @@ function buildHtmlDocument(contentHtml, options = {}) {
     customCss = `<style>\n${options.css}\n</style>`;
   } else if (options.stylesheet && fs.existsSync(options.stylesheet)) {
     customCss = `<style>\n${fs.readFileSync(options.stylesheet, 'utf8')}\n</style>`;
+  }
+
+  let mermaidTags = '';
+  if (contentHtml.includes('class="mermaid"') && mermaidScript) {
+    mermaidTags = `
+<script>
+${mermaidScript}
+</script>
+<script>
+  if (typeof mermaid !== 'undefined') {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans", sans-serif'
+    });
+    window.__mermaidPromise = mermaid.run({ querySelector: '.mermaid' }).catch(function(err) {
+      console.error('Mermaid render error:', err);
+    });
+  }
+</script>`;
   }
 
   return `<!DOCTYPE html>
@@ -42,6 +68,7 @@ ${baseStyles.print}
 </head>
 <body>
 ${contentHtml}
+${mermaidTags}
 </body>
 </html>`;
 }
@@ -131,6 +158,16 @@ async function convert(params = {}) {
       waitUntil: 'networkidle0',
       timeout: 30000
     });
+
+    // If Mermaid diagrams are present, wait until vector rendering completes
+    if (fullHtml.includes('class="mermaid"')) {
+      try {
+        await page.waitForFunction(() => window.__mermaidPromise !== undefined, { timeout: 10000 });
+        await page.evaluate(() => window.__mermaidPromise);
+      } catch {
+        // Continue if Mermaid render times out or errors
+      }
+    }
 
     const pdfOptions = {
       format: params.format || 'A4',

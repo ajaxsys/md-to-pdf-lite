@@ -55,20 +55,41 @@ $$
 
 # Page 2: Advanced Features
 
-## 4. Native Page Break Support (改ページ機能)
+## 4. Mermaid Vector Diagrams (フローチャート・ダイアグラム)
+
+Built-in offline vector diagramming with GitHub-style Mermaid syntax:
+
+```mermaid
+graph TD
+    A[Markdown Source] -->|markdown-it| B(HTML with KaTeX & Highlight.js)
+    B -->|Host Chrome / Puppeteer-Core| C{PDF Print Engine}
+    C -->|Zero Chromium Download| D[Commercial High-Res PDF]
+    
+    style A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style B fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
+    style C fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style D fill:#ede7f6,stroke:#7b1fa2,stroke-width:2px
+```
+
+---
+
+## 5. Native Page Break Support (改ページ機能)
 
 You can easily insert a clean page break anywhere using:
 - `<!-- pagebreak -->`
 - `---pagebreak---`
 - `<div class="page"/>`
 
-Tables and code blocks are automatically configured with `page-break-inside: avoid` so that table rows and code lines never split awkwardly across page margins.
+Tables, diagrams, and code blocks are automatically configured with `page-break-inside: avoid` so that table rows and flowcharts never split awkwardly across page margins.
 
-## 5. Checklist & Task Lists
+---
+
+## 6. Checklist & Feature Coverage
 
 - [x] Zero-download Chromium (Instant installation in ~5s)
 - [x] Auto-detect host Chrome, Chromium, Edge, or Brave
 - [x] CJK fonts & Japanese business document formatting
+- [x] Offline Mermaid diagram vector rendering
 - [x] KaTeX math equations
 - [x] Syntax-highlighted code blocks
 - [x] Cross-platform CLI + Node.js API

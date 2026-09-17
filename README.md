@@ -1,6 +1,6 @@
 # md-to-pdf-lite 🚀
 
-> **Ultra-lightweight, zero-chromium-bundle Markdown to PDF converter with native CJK typography, KaTeX math, syntax highlighting, and CI/CD automation.**
+> **Ultra-lightweight, zero-chromium-bundle Markdown to PDF engine. Optimized for CJK typography, with native support for offline Mermaid vector diagrams, KaTeX formulas, syntax highlighting, and CI/CD pipelines.**
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
 
@@ -16,6 +16,7 @@ Existing Markdown-to-PDF solutions often come with practical trade-offs:
 **`md-to-pdf-lite` solves all of these:**
 - ⚡ **Zero-Chromium Bundle (Lightning Fast)**: No 300MB+ browser downloads; lightweight JS dependencies install in seconds. Automatically discovers your host Google Chrome, Microsoft Edge, Brave, or Chromium.
 - 🎨 **Beautiful Out-of-the-box CJK Typography**: Commercial proposal & GitHub-style theme optimized for PingFang, Hiragino Sans, Meiryo, and system fonts.
+- 📊 **Offline Mermaid Vector Diagrams**: Flowcharts, sequence diagrams, and architecture graphs render directly to crisp vector SVGs without external network calls.
 - 📄 **Intuitive Page Breaks**: Cleanly split pages using `<!-- pagebreak -->` or `---pagebreak---`.
 - 🧮 **KaTeX Math & Syntax Highlighting**: Math formulas and code blocks render smoothly without external network requests.
 - 🤖 **Built for Automation**: Native CLI support for single or batch globs (`md2pdf-lite "docs/*.md"`), plus programmatic Node.js API and GitHub Actions workflow.

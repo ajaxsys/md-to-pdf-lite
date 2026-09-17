@@ -162,3 +162,17 @@ img {
   background-color: var(--color-canvas-default);
   border-radius: 4px;
 }
+
+.mermaid {
+  text-align: center;
+  margin: 20px 0;
+  background: transparent;
+  border: none;
+  overflow: visible;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}

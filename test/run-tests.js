@@ -25,7 +25,12 @@ async function runTests() {
 const a = 1;
 \`\`\`
 
+
 Formula: $E = mc^2$
+
+\`\`\`mermaid
+graph TD; A-->B;
+\`\`\`
 
 <!-- pagebreak -->
 
@@ -35,8 +40,9 @@ Page 2 content.
   assert.ok(html.includes('<table>'), 'Should contain table HTML');
   assert.ok(html.includes('class="hljs'), 'Should contain highlighted code');
   assert.ok(html.includes('class="katex"'), 'Should render KaTeX formula');
+  assert.ok(html.includes('class="mermaid"'), 'Should render mermaid block');
   assert.ok(html.includes('class="page-break"'), 'Should convert <!-- pagebreak --> tag');
-  console.log('  ✔ Parser correctly handles tables, code, KaTeX, and page breaks');
+  console.log('  ✔ Parser correctly handles tables, code, KaTeX, Mermaid, and page breaks');
 
   // Test 3: PDF Generation
   console.log('Test 3: Convert markdown to PDF buffer');
@@ -47,6 +53,16 @@ Page 2 content.
   assert.ok(result.buffer, 'Result should have buffer');
   assert.ok(result.buffer.length > 1000, `Buffer size should be reasonable: ${result.buffer.length} bytes`);
   console.log(`  ✔ PDF successfully rendered in memory (${result.buffer.length} bytes)`);
+
+  // Test 4: Mermaid Diagram PDF Rendering
+  console.log('Test 4: Render Markdown with Mermaid flowchart to PDF');
+  const mermaidResult = await convert({
+    markdown: '# Architecture\n\n```mermaid\ngraph LR\nClient --> Server\nServer --> Database\n```\n',
+    format: 'A4'
+  });
+  assert.ok(mermaidResult.buffer, 'Mermaid PDF result should have buffer');
+  assert.ok(mermaidResult.buffer.length > 5000, `Mermaid PDF buffer should be valid: ${mermaidResult.buffer.length} bytes`);
+  console.log(`  ✔ Mermaid flowchart successfully compiled into PDF (${mermaidResult.buffer.length} bytes)`);
 
   console.log('\n🎉 All tests passed successfully!\n');
 }

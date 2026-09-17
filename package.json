@@ -14,6 +14,7 @@
     "md-to-pdf",
     "puppeteer",
     "puppeteer-core",
+    "mermaid",
     "cjk",
     "katex",
     "cli",

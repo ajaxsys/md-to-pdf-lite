@@ -59,6 +59,9 @@ function createParser() {
     linkify: true,
     typographer: true,
     highlight: function (str, lang) {
+      if (lang === 'mermaid') {
+        return `<pre class="mermaid">${md.utils.escapeHtml(str)}</pre>`;
+      }
       if (lang && hljs.getLanguage(lang)) {
         try {
           return `<pre class="hljs"><code class="hljs language-${lang}">${

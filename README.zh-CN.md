@@ -1,6 +1,6 @@
 # md-to-pdf-lite 🚀
 
-> **超轻量、零 Chromium 捆绑包的现代 Markdown 转 PDF 引擎。深度优化中日韩（CJK）排版美学，原生支持 KaTeX 公式、语法高亮与自动化 CI/CD 流水线。**
+> **超轻量、零 Chromium 捆绑包的现代 Markdown 转 PDF 引擎。深度优化中日韩（CJK）排版美学，原生支持 Mermaid 矢量图表、KaTeX 公式、代码高亮与自动化 CI/CD 流水线。**
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
 
@@ -16,6 +16,7 @@
 **`md-to-pdf-lite` 为解决上述痛点而生：**
 - ⚡ **零 Chromium 捆绑（秒级极速安装）**：无需额外下载数百 MB 浏览器，纯 JS 依赖数秒即可装完。自动嗅探并复用本机已有的 Google Chrome、Microsoft Edge、Brave 或 Chromium；
 - 🎨 **开箱即用的商用级 CJK 排版**：针对苹方（PingFang SC）、微软雅黑、冬青黑体（Hiragino Sans）、Meiryo 等字体深度优化，字距舒展、行高舒适；
+- 📊 **离线 Mermaid 矢量图表**：支持流程图、时序图、架构图等，离线直接渲染为高清矢量 SVG；
 - 📄 **原生强制分页语法**：在 Markdown 任意位置插入 `<!-- pagebreak -->` 或 `---pagebreak---` 即可优雅换页；
 - 🧮 **离线 KaTeX 数学公式与代码高亮**：完整支持公式排版与现代编程语言高亮，生成过程 100% 离线，安全极速；
 - 🤖 **专为自动化与批量设计**：提供极简 CLI（支持多文件和通配符批量导出），并提供完整的 Node.js API 与 GitHub Actions 现成配置。
