@@ -43,7 +43,7 @@ ${mermaidScript}
       startOnLoad: false,
       theme: 'default',
       securityLevel: 'loose',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans", sans-serif'
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", "Hiragino Sans", "Yu Gothic", sans-serif'
     });
     window.__mermaidPromise = mermaid.run({ querySelector: '.mermaid' }).catch(function(err) {
       console.error('Mermaid render error:', err);
@@ -52,8 +52,13 @@ ${mermaidScript}
 </script>`;
   }
 
+  const docLang = options.lang || (
+    /[\u3040-\u30ff]/.test(contentHtml) ? "ja" :
+    /[\u4e00-\u9fa5]/.test(contentHtml) ? "zh-CN" : "en"
+  );
+
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${docLang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
