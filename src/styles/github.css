@@ -103,13 +103,13 @@ table {
 table th {
   font-weight: 600;
   background-color: var(--color-canvas-subtle);
-  padding: 8px 13px;
+  padding: 6px 10px;
   border: 1px solid var(--color-border-default);
   text-align: left;
 }
 
 table td {
-  padding: 8px 13px;
+  padding: 6px 10px;
   border: 1px solid var(--color-border-default);
   vertical-align: top;
 }

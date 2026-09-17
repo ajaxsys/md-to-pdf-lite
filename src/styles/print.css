@@ -32,6 +32,19 @@
 
   table {
     width: calc(100% - 2px) !important;
+    max-width: calc(100% - 2px) !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  table th,
+  table td {
+    padding: 6px 8px !important;
+  }
+
+  table code {
+    white-space: normal !important;
+    word-break: break-all;
   }
 
   tr, pre, blockquote, .katex-display, .mermaid {
