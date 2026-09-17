@@ -28,9 +28,9 @@
 
 | 主题名称 | 风格特征 | 适用场景 | 对应预览文件 |
 | :--- | :--- | :--- | :--- |
-| **`github`** (默认) | 经典技术社区风格、完整全网格边框、灰色代码背景 | 技术文档、API 手册、代码归档 | [`examples/sample-github.pdf`](examples/sample-github.pdf) |
-| **`clean`** | **现代商务极简、三线表设计（去除所有竖线）**、呼吸感留白 | 商业报价单、项目提案、对外白皮书 | [`examples/sample-clean.pdf`](examples/sample-clean.pdf) |
-| **`corporate-ja`** | **日本正规企业商务风、深绀色表头（濃紺 #1b365d）、左侧饰条见出、冬青黑/游黑体优化** | 見積書、稟議書、自治体/大企业提案、仕様書 | [`examples/sample-corporate-ja.pdf`](examples/sample-corporate-ja.pdf) |
+| **`github`** (默认) | 经典技术社区风格、完整全网格边框、灰色代码背景 | 技术文档、API 手册、代码归档 | [`sample-github.pdf`](../examples/sample-github.pdf) |
+| **`clean`** | **现代商务极简、三线表设计（去除所有竖线）**、呼吸感留白 | 商业报价单、项目提案、对外白皮书 | [`sample-clean.pdf`](../examples/sample-clean.pdf) |
+| **`corporate-ja`** | **日本正规企业商务风、深绀色表头（濃紺 #1b365d）、左侧饰条见出、冬青黑/游黑体优化** | 見積書、稟議書、自治体/大企业提案、仕様書 | [`sample-corporate-ja.pdf`](../examples/sample-corporate-ja.pdf) |
 
 ### 切换内置主题命令：
 ```bash

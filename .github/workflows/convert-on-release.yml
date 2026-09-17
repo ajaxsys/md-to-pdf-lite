@@ -27,7 +27,7 @@ jobs:
       - name: Batch Convert Markdown Documents
         run: |
           mkdir -p output-pdfs
-          md2pdf-lite "docs/*.md" -o output-pdfs/
+          md2pdf-lite "docs/*.md" "examples/*.md" -o output-pdfs/
           
       - name: Upload PDF Artifacts
         uses: actions/upload-artifact@v4

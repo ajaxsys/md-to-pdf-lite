@@ -24,17 +24,21 @@ In the AI era, you **no longer need to manually write hundreds of lines of CSS**
 
 ## 1. Built-in Themes & Sample Previews
 
-Two professionally tuned themes are built directly into `md-to-pdf-lite`:
+Three professionally tuned themes are built directly into `md-to-pdf-lite`:
 
 | Theme | Key Visual Characteristics | Best Used For | Sample Preview PDF |
 | :--- | :--- | :--- | :--- |
-| **`github`** (default) | Classic technical developer style, full-grid borders, light-gray code background | Technical docs, API references, code archives | [`examples/sample-github.pdf`](examples/sample-github.pdf) |
-| **`clean`** | **Modern minimalist, borderless Booktabs table (no vertical lines)**, generous whitespace | Commercial proposals, invoices, executive whitepapers | [`examples/sample-clean.pdf`](examples/sample-clean.pdf) |
+| **`github`** (default) | Classic technical developer style, full-grid borders, light-gray code background | Technical docs, API references, code archives | [`sample-github.pdf`](../examples/sample-github.pdf) |
+| **`clean`** | **Modern minimalist, borderless Booktabs table (no vertical lines)**, generous whitespace | Commercial proposals, invoices, executive whitepapers | [`sample-clean.pdf`](../examples/sample-clean.pdf) |
+| **`corporate-ja`** | **Japanese enterprise business theme (navy header #1b365d, accent bar headings, Hiragino/YuGothic)** | Invoices, corporate ringisho, government/B2B proposals | [`sample-corporate-ja.pdf`](../examples/sample-corporate-ja.pdf) |
 
 ### Switching Built-in Themes:
 ```bash
 # Clean business theme (borderless table, breathable layout)
 md2pdf-lite document.md --theme clean -o proposal.pdf
+
+# Japanese corporate business theme
+md2pdf-lite document.md --theme corporate-ja -o proposal.pdf
 
 # Classic GitHub developer theme
 md2pdf-lite document.md --theme github -o manual.pdf

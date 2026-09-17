@@ -91,7 +91,7 @@ md2pdf-lite document.md -s custom.css
 md2pdf-lite document.md -c "body { font-size: 16px; color: #333; }"
 ```
 > 🎨 **想要让 ChatGPT / Claude 帮您一秒生成公司专属品牌样式？**  
-> 请阅读专门的 👉 **[面向 AI 时代的自定义排版指南 (CUSTOMIZATION.zh-CN.md)](CUSTOMIZATION.zh-CN.md)**，内含复制即用的标准 AI Prompt 模板与核心 CSS 字典！
+> 请阅读专门的 👉 **[面向 AI 时代的自定义排版指南 (docs/CUSTOMIZATION.zh-CN.md)](docs/CUSTOMIZATION.zh-CN.md)**，内含复制即用的标准 AI Prompt 模板与核心 CSS 字典！
 
 ### 7. 环境自检
 ```bash

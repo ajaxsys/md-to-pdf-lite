@@ -24,17 +24,21 @@
 
 ## 1. 組み込みテーマとプレビュー (Presets & Previews)
 
-`md-to-pdf-lite` には、専門的にチューニングされた 2 種類の組み込みテーマが用意されており、`--theme <name>` で瞬時に切り替え可能です：
+`md-to-pdf-lite` には、専門的にチューニングされた 3 種類の組み込みテーマが用意されており、`--theme <name>` で瞬時に切り替え可能です：
 
 | テーマ名 | 主な視覚的特徴 | 推奨される用途 | プレビュー PDF |
 | :--- | :--- | :--- | :--- |
-| **`github`** (デフォルト) | 開発者に馴染みのある GitHub 風、格子枠線テーブル、薄灰色のコード背景 | 技術ドキュメント、API リファレンス、設計書 | [`examples/sample-github.pdf`](examples/sample-github.pdf) |
-| **`clean`** | **欧米ビジネス標準の三線表（縦罫線を全廃）**、十分な余白と高い可読性 | 見積書、提案書、エグゼクティブ向け白書 | [`examples/sample-clean.pdf`](examples/sample-clean.pdf) |
+| **`github`** (デフォルト) | 開発者に馴染みのある GitHub 風、格子枠線テーブル、薄灰色のコード背景 | 技術ドキュメント、API リファレンス、設計書 | [`sample-github.pdf`](../examples/sample-github.pdf) |
+| **`clean`** | **欧米ビジネス標準の三線表（縦罫線を全廃）**、十分な余白と高い可読性 | 見積書、提案書、エグゼクティブ向け白書 | [`sample-clean.pdf`](../examples/sample-clean.pdf) |
+| **`corporate-ja`** | **日本企業向けビジネス文書（濃紺ヘッダー #1b365d、アクセント見出し、游ゴシック/ヒラギノ組版）** | 見積書、請求書、稟議書、官公庁・大手企業向け提案書 | [`sample-corporate-ja.pdf`](../examples/sample-corporate-ja.pdf) |
 
 ### 組み込みテーマの切り替えコマンド：
 ```bash
 # 縦罫線のない極簡ビジネススタイル（三線表）
 md2pdf-lite document.md --theme clean -o proposal.pdf
+
+# 日本企業向けビジネススタイル
+md2pdf-lite document.md --theme corporate-ja -o proposal.pdf
 
 # 従来の GitHub 技術ドキュメントスタイル
 md2pdf-lite document.md --theme github -o manual.pdf

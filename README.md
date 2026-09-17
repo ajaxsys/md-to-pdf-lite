@@ -91,7 +91,7 @@ md2pdf-lite document.md -s custom.css
 md2pdf-lite document.md -c "body { font-size: 16px; color: #333; }"
 ```
 > 🎨 **Want AI (ChatGPT / Claude / Cursor) to generate custom themes for your brand?**  
-> Read our dedicated 👉 **[AI-Oriented Theming Guide (CUSTOMIZATION.md)](CUSTOMIZATION.md)** featuring ready-to-use prompts, recipes, and CSS selector specifications!
+> Read our dedicated 👉 **[AI-Oriented Theming Guide (docs/CUSTOMIZATION.md)](docs/CUSTOMIZATION.md)** featuring ready-to-use prompts, recipes, and CSS selector specifications!
 
 ### 7. Check environment
 ```bash

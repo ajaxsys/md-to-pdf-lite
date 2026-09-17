@@ -91,7 +91,7 @@ md2pdf-lite document.md -s custom.css
 md2pdf-lite document.md -c "body { font-size: 16px; color: #333; }"
 ```
 > 🎨 **ChatGPT や Claude に自社専用スタイルを一瞬で生成させたい場合：**  
-> 専用ガイド 👉 **[AI 時代のカスタム組版ガイド (CUSTOMIZATION.ja.md)](CUSTOMIZATION.ja.md)** をご覧ください。コピペですぐ使えるプロンプト雛形とセレクタ辞書を収録しています！
+> 専用ガイド 👉 **[AI 時代のカスタム組版ガイド (docs/CUSTOMIZATION.ja.md)](docs/CUSTOMIZATION.ja.md)** をご覧ください。コピペですぐ使えるプロンプト雛形とセレクタ辞書を収録しています！
 
 ### 7. 動作環境の自己診断
 ```bash
