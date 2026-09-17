@@ -8,13 +8,13 @@
 
 ## 💡 为什么选择 md-to-pdf-lite？
 
-市面上现有的 Markdown 转 PDF 工具普遍存在以下痛点：
-- **300MB+ 笨重 Chromium 下载地狱**：老旧的 `md-to-pdf` 安装时非要从 Google 服务器下载内置 Chromium，在 Apple Silicon (M1/M2/M3/M4) 和现代 Node.js 上极易出现安装卡死或连接挂起；
-- **被锁死在 IDE 界面**：像 VS Code 的 `markdown-pdf` 插件排版虽然不错，但只能人肉右键单个导出，无法放入命令行脚本、Git 钩子或云端流水线进行批量生成；
-- **中日韩（CJK）排版粗糙**：标准打印样式经常出现字体发虚、表格跨页腰斩、缺乏强制分页支持。
+市面上现有的 Markdown 转 PDF 方案在特定场景下往往存在一些局限：
+- **庞大的内置 Chromium 下载成本**：许多基于 Puppeteer 的传统 CLI 方案通常在安装时需要下载数百 MB 的专用 Chromium，在 Apple Silicon、容器或特定网络环境下容易遇到安装耗时久甚至超时中断；
+- **工作流易受限于图形界面**：部分编辑器扩展主要面向单文件手动交互导出，难以灵活集成到命令行脚本、Git 钩子或云端自动化 CI/CD 批量构建流水线中；
+- **中日韩（CJK）排版适配成本高**：通用打印样式有时可能出现字体回退不理想、表格分页截断或缺少便捷的强制换页机制。
 
 **`md-to-pdf-lite` 为解决上述痛点而生：**
-- ⚡ **零笨重依赖（秒级安装）**：安装包仅几百 KB，5 秒内装完。自动嗅探并复用本机已有的 Google Chrome、Microsoft Edge、Brave 或 Chromium；
+- ⚡ **零 Chromium 捆绑（秒级极速安装）**：无需额外下载数百 MB 浏览器，纯 JS 依赖数秒即可装完。自动嗅探并复用本机已有的 Google Chrome、Microsoft Edge、Brave 或 Chromium；
 - 🎨 **开箱即用的商用级 CJK 排版**：针对苹方（PingFang SC）、微软雅黑、冬青黑体（Hiragino Sans）、Meiryo 等字体深度优化，字距舒展、行高舒适；
 - 📄 **原生强制分页语法**：在 Markdown 任意位置插入 `<!-- pagebreak -->` 或 `---pagebreak---` 即可优雅换页；
 - 🧮 **离线 KaTeX 数学公式与代码高亮**：完整支持公式排版与现代编程语言高亮，生成过程 100% 离线，安全极速；

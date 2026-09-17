@@ -12,14 +12,23 @@
     "pdf",
     "markdown-to-pdf",
     "md-to-pdf",
+    "puppeteer",
+    "puppeteer-core",
     "cjk",
     "katex",
     "cli",
-    "puppeteer-core",
     "lightweight"
   ],
   "author": "ajaxsys",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajaxsys/md-to-pdf-lite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ajaxsys/md-to-pdf-lite/issues"
+  },
+  "homepage": "https://github.com/ajaxsys/md-to-pdf-lite#readme",
   "engines": {
     "node": ">=18.0.0"
   },

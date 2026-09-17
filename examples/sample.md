@@ -16,10 +16,10 @@
 
 | 項目 (Item) | 区分 (Category) | 数量 (Qty) | 単価 (Unit Price) | 金額 (Total Amount) |
 | :--- | :---: | :---: | ---: | ---: |
-| **AWS Cloud Infrastructure** | EC2 + RDS | 1式 | ¥520,000 | **¥520,000** |
-| **Security Scanning Engine** | ClamAV Core | 1式 | ¥180,000 | **¥180,000** |
-| **Automation CI/CD Pipeline** | GitHub Actions | 1式 | ¥120,000 | **¥120,000** |
-| **総合計 (Grand Total)** | — | — | — | **¥820,000** |
+| **Web Architecture Consulting** | Technical Advisory | 1式 | ¥350,000 | **¥350,000** |
+| **Frontend UI/UX Design** | Responsive Layout | 1式 | ¥280,000 | **¥280,000** |
+| **CI/CD Automated Workflow** | GitHub Actions Pipeline | 1式 | ¥120,000 | **¥120,000** |
+| **総合計 (Grand Total)** | — | — | — | **¥750,000** |
 
 ---
 
