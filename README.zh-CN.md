@@ -69,16 +69,28 @@ md2pdf-lite document.md --format Letter
 md2pdf-lite presentation.md --landscape
 ```
 
-### 5. 自定义排版样式
+### 5. 切换预设主题（GitHub 经典技术风 vs 现代商务三线表）
+```bash
+# 默认: GitHub 技术风格 (完整网格表格，适合技术文档/API)
+md2pdf-lite document.md -t github
+
+# 现代商务极简风格 (欧美偏好的无竖线三线表、优雅呼吸感，适合报价单/白皮书)
+md2pdf-lite proposal.md -t clean
+```
+👉 *效果对比预览：经典网格风 [`sample-github.pdf`](examples/sample-github.pdf) vs 商务极简风 [`sample-clean.pdf`](examples/sample-clean.pdf)*
+
+### 6. 自定义排版样式（支持 AI 提示词定制）
 ```bash
 # 使用外部 CSS 文件
 md2pdf-lite document.md -s custom.css
 
-# 传入内联 CSS 规则
+# 传入内联 CSS 规则微调
 md2pdf-lite document.md -c "body { font-size: 16px; color: #333; }"
 ```
+> 🎨 **想要让 ChatGPT / Claude 帮您一秒生成公司专属品牌样式？**  
+> 请阅读专门的 👉 **[面向 AI 时代的自定义排版指南 (CUSTOMIZATION.md)](CUSTOMIZATION.md)**，内含复制即用的标准 AI Prompt 模板与核心 CSS 字典！
 
-### 6. 环境自检
+### 7. 环境自检
 ```bash
 md2pdf-lite --check-env
 ```

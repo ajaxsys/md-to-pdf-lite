@@ -1,4 +1,4 @@
-const { convert, buildHtmlDocument } = require('./converter');
+const { convert, buildHtmlDocument, builtinThemes } = require('./converter');
 const { parseMarkdown, createParser } = require('./markdown-parser');
 const { findChromeExecutable } = require('./chrome-finder');
 
@@ -36,5 +36,6 @@ module.exports = {
   parseMarkdown,
   createParser,
   buildHtmlDocument,
-  findChromeExecutable
+  findChromeExecutable,
+  builtinThemes
 };

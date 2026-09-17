@@ -69,7 +69,17 @@ md2pdf-lite document.md --format Letter
 md2pdf-lite presentation.md --landscape
 ```
 
-### 5. カスタムスタイルの適用
+### 5. 組み込みテーマの切り替え（GitHub 技術スタイル vs 現代ビジネス三線表）
+```bash
+# デフォルト: GitHub 技術スタイル（全体罫線テーブル、技術ドキュメント向け）
+md2pdf-lite document.md -t github
+
+# 現代ビジネス極簡スタイル（縦罫線のない三線表・余白感、見積書・提案書向け）
+md2pdf-lite proposal.md -t clean
+```
+👉 *スタイル比較プレビュー：GitHub 格子風 [`sample-github.pdf`](examples/sample-github.pdf) vs ビジネス三線表風 [`sample-clean.pdf`](examples/sample-clean.pdf)*
+
+### 6. カスタムスタイルの適用（AI 時代向けカスタマイズ）
 ```bash
 # 外部 CSS ファイルの指定
 md2pdf-lite document.md -s custom.css
@@ -77,8 +87,10 @@ md2pdf-lite document.md -s custom.css
 # インライン CSS の直接指定
 md2pdf-lite document.md -c "body { font-size: 16px; color: #333; }"
 ```
+> 🎨 **ChatGPT や Claude に自社専用スタイルを一瞬で生成させたい場合：**  
+> 専用ガイド 👉 **[AI 時代のカスタム組版ガイド (CUSTOMIZATION.md)](CUSTOMIZATION.md)** をご覧ください。コピペですぐ使えるプロンプト雛形とセレクタ辞書を収録しています！
 
-### 6. 動作環境の自己診断
+### 7. 動作環境の自己診断
 ```bash
 md2pdf-lite --check-env
 ```

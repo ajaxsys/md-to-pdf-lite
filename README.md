@@ -69,16 +69,28 @@ md2pdf-lite document.md --format Letter
 md2pdf-lite presentation.md --landscape
 ```
 
-### 5. Custom styling
+### 5. Switch Built-in Themes (Classic GitHub vs Modern Clean Booktabs)
+```bash
+# Default: GitHub technical style with full-grid borders
+md2pdf-lite document.md -t github
+
+# Modern Clean style: Borderless table (Booktabs), breathable whitespace for proposals & invoices
+md2pdf-lite proposal.md -t clean
+```
+👉 *Preview comparison: GitHub Grid [`sample-github.pdf`](examples/sample-github.pdf) vs Clean Booktabs [`sample-clean.pdf`](examples/sample-clean.pdf)*
+
+### 6. Custom styling (AI-Assisted Theming)
 ```bash
 # Custom CSS file
 md2pdf-lite document.md -s custom.css
 
-# Inline CSS
+# Inline CSS rules
 md2pdf-lite document.md -c "body { font-size: 16px; color: #333; }"
 ```
+> 🎨 **Want AI (ChatGPT / Claude / Cursor) to generate custom themes for your brand?**  
+> Read our dedicated 👉 **[AI-Oriented Theming Guide (CUSTOMIZATION.md)](CUSTOMIZATION.md)** featuring ready-to-use prompts, recipes, and CSS selector specifications!
 
-### 6. Check environment
+### 7. Check environment
 ```bash
 md2pdf-lite --check-env
 ```

@@ -7,8 +7,12 @@ const { parseMarkdown } = require('./markdown-parser');
 const { findChromeExecutable } = require('./chrome-finder');
 
 // Cache builtin CSS files and vendor scripts
-const baseStyles = {
+const builtinThemes = {
   github: fs.readFileSync(path.join(__dirname, 'styles/github.css'), 'utf8'),
+  clean: fs.readFileSync(path.join(__dirname, 'styles/clean.css'), 'utf8')
+};
+
+const baseStyles = {
   print: fs.readFileSync(path.join(__dirname, 'styles/print.css'), 'utf8'),
   highlight: fs.readFileSync(require.resolve('highlight.js/styles/github.css'), 'utf8'),
   katex: fs.readFileSync(require.resolve('katex/dist/katex.min.css'), 'utf8')
@@ -24,6 +28,9 @@ const mermaidScript = fs.existsSync(mermaidScriptPath)
  */
 function buildHtmlDocument(contentHtml, options = {}) {
   const title = options.title || 'Document';
+  const themeName = (options.theme || 'github').toLowerCase();
+  const themeCss = builtinThemes[themeName] || builtinThemes.github;
+
   let customCss = '';
   if (options.css) {
     customCss = `<style>\n${options.css}\n</style>`;
@@ -43,7 +50,7 @@ ${mermaidScript}
       startOnLoad: false,
       theme: 'default',
       securityLevel: 'loose',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", "Hiragino Sans", "Yu Gothic", sans-serif'
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans", sans-serif'
     });
     window.__mermaidPromise = mermaid.run({ querySelector: '.mermaid' }).catch(function(err) {
       console.error('Mermaid render error:', err);
@@ -64,7 +71,7 @@ ${mermaidScript}
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(title)}</title>
   <style>
-${baseStyles.github}
+${themeCss}
 ${baseStyles.highlight}
 ${baseStyles.katex}
 ${baseStyles.print}
@@ -122,6 +129,7 @@ async function convert(params = {}) {
   const title = params.title || (params.input ? path.basename(params.input, path.extname(params.input)) : 'Document');
   const fullHtml = buildHtmlDocument(htmlContent, {
     title,
+    theme: params.theme,
     css: params.css,
     stylesheet: params.stylesheet
   });
@@ -211,5 +219,6 @@ async function convert(params = {}) {
 
 module.exports = {
   convert,
-  buildHtmlDocument
+  buildHtmlDocument,
+  builtinThemes
 };

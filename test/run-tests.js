@@ -64,6 +64,17 @@ Page 2 content.
   assert.ok(mermaidResult.buffer.length > 5000, `Mermaid PDF buffer should be valid: ${mermaidResult.buffer.length} bytes`);
   console.log(`  ✔ Mermaid flowchart successfully compiled into PDF (${mermaidResult.buffer.length} bytes)`);
 
+  // Test 5: Clean Business Theme Rendering
+  console.log('Test 5: Render Markdown with clean borderless table theme');
+  const cleanResult = await convert({
+    markdown: '# Proposal\n\n| Service | Cost |\n| :--- | ---: |\n| Cloud | $500 |\n',
+    theme: 'clean',
+    format: 'A4'
+  });
+  assert.ok(cleanResult.buffer, 'Clean theme PDF result should have buffer');
+  assert.ok(cleanResult.buffer.length > 3000, 'Clean theme PDF buffer should be valid');
+  console.log(`  ✔ Clean business theme successfully compiled into PDF (${cleanResult.buffer.length} bytes)`);
+
   console.log('\n🎉 All tests passed successfully!\n');
 }
 
