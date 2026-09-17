@@ -9,16 +9,18 @@
 ## 💡 Why md-to-pdf-lite?
 
 Existing Markdown-to-PDF solutions often come with practical trade-offs:
-- **Heavyweight 300MB+ Chromium downloads**: Many Puppeteer-based CLI tools force a full bundled Chromium download during installation, which frequently hangs or fails in restricted networks, container environments, or Apple Silicon architectures.
-- **GUI-bound workflows**: Many popular editor extensions require manual exports from a GUI window, making them difficult to automate in command-line scripts, Git hooks, or CI/CD pipelines.
+- **Data Privacy Risks in Online Converters**: Web-based SaaS tools force you to upload sensitive documents to third-party servers, creating compliance and data leak hazards for corporate invoices, proprietary architecture, and private notes;
+- **Heavyweight 300MB+ Chromium downloads**: Many Puppeteer-based CLI tools force a full bundled Chromium download during installation, which frequently hangs or fails in restricted networks, container environments, or Apple Silicon architectures;
+- **GUI-bound workflows**: Many popular editor extensions require manual exports from a GUI window, making them difficult to automate in command-line scripts, Git hooks, or CI/CD pipelines;
 - **Suboptimal CJK (Chinese, Japanese, Korean) typography**: Generic print stylesheets often suffer from awkward font fallbacks, truncated table pagination, and lack of intuitive page-break controls.
 
 **`md-to-pdf-lite` solves all of these:**
-- ⚡ **Zero-Chromium Bundle (Lightning Fast)**: No 300MB+ browser downloads; lightweight JS dependencies install in seconds. Automatically discovers your host Google Chrome, Microsoft Edge, Brave, or Chromium.
-- 🎨 **Beautiful Out-of-the-box CJK Typography**: Commercial proposal & GitHub-style theme optimized for PingFang, Hiragino Sans, Meiryo, and system fonts.
-- 📊 **Offline Mermaid Vector Diagrams**: Flowcharts, sequence diagrams, and architecture graphs render directly to crisp vector SVGs without external network calls.
-- 📄 **Intuitive Page Breaks**: Cleanly split pages using `<!-- pagebreak -->` or `---pagebreak---`.
-- 🧮 **KaTeX Math & Syntax Highlighting**: Math formulas and code blocks render smoothly without external network requests.
+- 🔒 **100% Offline & Air-Gapped at Runtime**: After `npm install`, all Markdown rendering, Mermaid vector diagrams, KaTeX math, and local images execute completely inside your local host browser sandbox. **Zero external network requests at runtime**, ensuring total compliance for private enterprise networks and confidential data;
+- ⚡ **Zero-Chromium Bundle (Lightning Fast)**: No 300MB+ browser downloads; lightweight JS dependencies install in seconds. Automatically discovers your host Google Chrome, Microsoft Edge, Brave, or Chromium;
+- 🎨 **Beautiful Out-of-the-box CJK Typography**: Commercial proposal & GitHub-style theme optimized for PingFang, Hiragino Sans, Meiryo, and system fonts;
+- 📊 **Offline Mermaid Vector Diagrams**: Flowcharts, sequence diagrams, and architecture graphs render directly to crisp vector SVGs without external network calls;
+- 📄 **Intuitive Page Breaks**: Cleanly split pages using `<!-- pagebreak -->` or `---pagebreak---`;
+- 🧮 **KaTeX Math & Syntax Highlighting**: Math formulas and code blocks render smoothly without external network requests;
 - 🤖 **Built for Automation**: Native CLI support for single or batch globs (`md2pdf-lite "docs/*.md"`), plus programmatic Node.js API and GitHub Actions workflow.
 
 ---
