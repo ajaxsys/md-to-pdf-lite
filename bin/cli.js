@@ -15,7 +15,7 @@ program
   .argument('[files...]', 'Markdown file(s) or glob patterns to convert')
   .option('-o, --output <path>', 'Output PDF file path or directory')
   .option('-f, --format <format>', 'Paper format: A4, Letter, A3, etc.', 'A4')
-  .option('-t, --theme <theme>', 'Built-in styling theme: "github" (default) or "clean"', 'github')
+  .option('-t, --theme <theme>', 'Built-in styling theme: "github" (default), "clean", or "corporate-ja"', 'github')
   .option('-s, --stylesheet <path>', 'Path to custom CSS stylesheet')
   .option('-c, --css <styles>', 'Custom inline CSS rules')
   .option('-l, --landscape', 'Use landscape orientation', false)

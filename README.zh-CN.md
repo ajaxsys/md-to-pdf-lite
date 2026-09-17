@@ -69,15 +69,18 @@ md2pdf-lite document.md --format Letter
 md2pdf-lite presentation.md --landscape
 ```
 
-### 5. 切换预设主题（GitHub 经典技术风 vs 现代商务三线表）
+### 5. 切换预设主题（GitHub 技术风 / 欧美现代极简 / 日本商务大企业风）
 ```bash
-# 默认: GitHub 技术风格 (完整网格表格，适合技术文档/API)
+# 1. 默认: GitHub 技术风格 (全网格边框、Primer 色系，适合技术文档/API 规格书)
 md2pdf-lite document.md -t github
 
-# 现代商务极简风格 (欧美偏好的无竖线三线表、优雅呼吸感，适合报价单/白皮书)
+# 2. 现代商务极简风格 (欧美偏好的 Booktabs 无竖线三线表、优雅呼吸感，适合报价单/白皮书)
 md2pdf-lite proposal.md -t clean
+
+# 3. 日本正式商务风格 (日企大厂/SIer 标杆深绀色表头、左粗侧饰条、冬青黑/游黑体，适合見積書/稟議書/提案書)
+md2pdf-lite estimate.md -t corporate-ja
 ```
-👉 *效果对比预览：经典网格风 [`sample-github.pdf`](examples/sample-github.pdf) vs 商务极简风 [`sample-clean.pdf`](examples/sample-clean.pdf)*
+👉 *多风格效果对比实测：经典技术风 [`sample-github.pdf`](examples/sample-github.pdf) vs 商务极简三线表 [`sample-clean.pdf`](examples/sample-clean.pdf) vs 日本正式商务风 [`sample-corporate-ja.pdf`](examples/sample-corporate-ja.pdf)*
 
 ### 6. 自定义排版样式（支持 AI 提示词定制）
 ```bash

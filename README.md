@@ -69,15 +69,18 @@ md2pdf-lite document.md --format Letter
 md2pdf-lite presentation.md --landscape
 ```
 
-### 5. Switch Built-in Themes (Classic GitHub vs Modern Clean Booktabs)
+### 5. Switch Built-in Themes (GitHub / Clean Booktabs / Corporate Japan)
 ```bash
-# Default: GitHub technical style with full-grid borders
+# 1. Default: GitHub Technical Style (Full-grid borders, official Primer palette, ideal for dev docs)
 md2pdf-lite document.md -t github
 
-# Modern Clean style: Borderless table (Booktabs), breathable whitespace for proposals & invoices
+# 2. Modern Clean Style: Borderless Booktabs table, breathable whitespace, ideal for proposals & invoices
 md2pdf-lite proposal.md -t clean
+
+# 3. Corporate Japan Style: Classic Navy headers, accent bar headings, Hiragino/YuGothic typography, ideal for Japanese estimates & formal proposals
+md2pdf-lite estimate.md -t corporate-ja
 ```
-👉 *Preview comparison: GitHub Grid [`sample-github.pdf`](examples/sample-github.pdf) vs Clean Booktabs [`sample-clean.pdf`](examples/sample-clean.pdf)*
+👉 *Preview comparison: GitHub Grid [`sample-github.pdf`](examples/sample-github.pdf) vs Clean Booktabs [`sample-clean.pdf`](examples/sample-clean.pdf) vs Corporate Japan [`sample-corporate-ja.pdf`](examples/sample-corporate-ja.pdf)*
 
 ### 6. Custom styling (AI-Assisted Theming)
 ```bash

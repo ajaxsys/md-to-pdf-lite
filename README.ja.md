@@ -69,15 +69,18 @@ md2pdf-lite document.md --format Letter
 md2pdf-lite presentation.md --landscape
 ```
 
-### 5. 組み込みテーマの切り替え（GitHub 技術スタイル vs 現代ビジネス三線表）
+### 5. 組み込みテーマの切り替え（GitHub技術風 / クリーン書票風 / 日本ビジネス帳票風）
 ```bash
-# デフォルト: GitHub 技術スタイル（全体罫線テーブル、技術ドキュメント向け）
+# 1. デフォルト: GitHub 技術ドキュメント風 (Primer公式グリッド表、API仕様書向け)
 md2pdf-lite document.md -t github
 
-# 現代ビジネス極簡スタイル（縦罫線のない三線表・余白感、見積書・提案書向け）
+# 2. モダン・クリーン風 (欧米スタイルの三線表・罫線レス、ホワイトペーパー・見積向け)
 md2pdf-lite proposal.md -t clean
+
+# 3. 日本企業ビジネス・稟議書風 (伝統の濃紺ヘッダー、縦帯見出し、ヒラギノ角ゴ/游ゴシック最適化、御見積書・稟議書向け)
+md2pdf-lite estimate.md -t corporate-ja
 ```
-👉 *スタイル比較プレビュー：GitHub 格子風 [`sample-github.pdf`](examples/sample-github.pdf) vs ビジネス三線表風 [`sample-clean.pdf`](examples/sample-clean.pdf)*
+👉 *仕上がり比較サンプル：GitHub風 [`sample-github.pdf`](examples/sample-github.pdf) vs クリーン風 [`sample-clean.pdf`](examples/sample-clean.pdf) vs 日本ビジネス風 [`sample-corporate-ja.pdf`](examples/sample-corporate-ja.pdf)*
 
 ### 6. カスタムスタイルの適用（AI 時代向けカスタマイズ）
 ```bash

@@ -24,12 +24,13 @@
 
 ## 1. 内置主题与样例预览 (Presets & Previews)
 
-工具箱内置了两种经过专业调优的基础预设，可通过 `--theme <name>` 直接启用：
+工具箱内置了三种经过专业调优的基础预设，可通过 `--theme <name>` 直接启用：
 
 | 主题名称 | 风格特征 | 适用场景 | 对应预览文件 |
 | :--- | :--- | :--- | :--- |
 | **`github`** (默认) | 经典技术社区风格、完整全网格边框、灰色代码背景 | 技术文档、API 手册、代码归档 | [`examples/sample-github.pdf`](examples/sample-github.pdf) |
 | **`clean`** | **现代商务极简、三线表设计（去除所有竖线）**、呼吸感留白 | 商业报价单、项目提案、对外白皮书 | [`examples/sample-clean.pdf`](examples/sample-clean.pdf) |
+| **`corporate-ja`** | **日本正规企业商务风、深绀色表头（濃紺 #1b365d）、左侧饰条见出、冬青黑/游黑体优化** | 見積書、稟議書、自治体/大企业提案、仕様書 | [`examples/sample-corporate-ja.pdf`](examples/sample-corporate-ja.pdf) |
 
 ### 切换内置主题命令：
 ```bash
@@ -281,7 +282,7 @@ const { convert } = require('md-to-pdf-lite');
 await convert({
   input: './document.md',
   output: './dist/document.pdf',
-  theme: 'clean',             // 内置主题: 'github' | 'clean'
+  theme: 'corporate-ja',      // 内置主题: 'github' | 'clean' | 'corporate-ja'
   stylesheet: './my-theme.css',// 外部 CSS 路径
   css: 'h1 { color: #0288d1; }'// 内联 CSS 覆盖
 });

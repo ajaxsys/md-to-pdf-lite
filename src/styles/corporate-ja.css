@@ -1,0 +1,216 @@
+/* Japanese Corporate Business Theme (信頼感のある日本ビジネス文書・稟議書・見積書スタイル) */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --font-ja-business: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", "BIZ UDPGothic", Meiryo, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --color-primary: #1b365d;         /* 濃紺 (Corporate Navy) - 信頼・格式 */
+  --color-primary-light: #f0f4f8;   /* 淡灰青 (Subtle Blue Grey) */
+  --color-text-main: #2b354f;       /* 濃墨 (Dark Slate Text) */
+  --color-text-muted: #64748b;      /* 鈍色 (Muted Grey) */
+  --color-heading: #1b365d;         /* 標題濃紺 */
+  --color-border: #cbd5e1;          /* 境界線 (Refined Border) */
+  --color-border-subtle: #e2e8f0;   /* 薄灰境界 */
+  --color-bg-alt: #f8fafc;          /* 交互背景 */
+}
+
+body {
+  font-family: var(--font-ja-business);
+  font-size: 14px;
+  line-height: 1.68;
+  letter-spacing: 0.02em;
+  color: var(--color-text-main);
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Headings (日本の公文書・提案書に準拠した階層デザイン) */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-heading);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+}
+
+h1 {
+  font-size: 22px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2.5px solid var(--color-primary);
+}
+
+h2 {
+  font-size: 17px;
+  margin-top: 26px;
+  margin-bottom: 14px;
+  padding: 4px 0 4px 10px;
+  border-left: 5px solid var(--color-primary);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: linear-gradient(90deg, rgba(27, 54, 93, 0.04) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+h3 {
+  font-size: 14.5px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--color-border);
+  color: var(--color-text-main);
+}
+
+h4 {
+  font-size: 13.5px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  color: var(--color-text-main);
+}
+
+p, ul, ol, dl {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+li {
+  margin-top: 0.3em;
+}
+
+li + li {
+  margin-top: 0.35em;
+}
+
+strong, b {
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+/* Links */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(27, 54, 93, 0.3);
+}
+
+a:hover {
+  border-bottom-color: var(--color-primary);
+}
+
+/* Commercial Business Table (日本企業向け高格式帳票・見積テーブル) */
+table {
+  width: calc(100% - 2px) !important;
+  max-width: calc(100% - 2px) !important;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid var(--color-primary);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+table th {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 8px 10px;
+  border: 1px solid var(--color-primary);
+  text-align: left;
+  letter-spacing: 0.03em;
+  font-size: 13px;
+}
+
+table td {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  vertical-align: middle;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: var(--color-bg-alt);
+}
+
+/* Blockquote (備考・特記事項・注記フレーム) */
+blockquote {
+  margin: 18px 0;
+  padding: 12px 18px;
+  color: var(--color-text-main);
+  background-color: var(--color-primary-light);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 0 4px 4px 0;
+  font-size: 13.5px;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Code & Pre (コードおよび仕様パラメータ) */
+code {
+  font-family: var(--font-mono);
+  font-size: 86%;
+  padding: 0.18em 0.42em;
+  color: var(--color-primary);
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 3px;
+}
+
+table code {
+  white-space: normal !important;
+  word-break: break-all;
+}
+
+pre {
+  margin: 18px 0;
+  padding: 14px 16px;
+  overflow: auto;
+  font-size: 86%;
+  line-height: 1.45;
+  background-color: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+pre code {
+  color: inherit;
+  font-size: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  white-space: pre;
+}
+
+/* Horizontal Rule */
+hr {
+  height: 1px;
+  padding: 0;
+  margin: 28px 0;
+  background-color: var(--color-border);
+  border: 0;
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+/* Mermaid vector diagrams */
+.mermaid {
+  text-align: center;
+  margin: 22px 0;
+  background: transparent;
+  border: none;
+  overflow: visible;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}

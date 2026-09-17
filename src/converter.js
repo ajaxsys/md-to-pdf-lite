@@ -9,7 +9,8 @@ const { findChromeExecutable } = require('./chrome-finder');
 // Cache builtin CSS files and vendor scripts
 const builtinThemes = {
   github: fs.readFileSync(path.join(__dirname, 'styles/github.css'), 'utf8'),
-  clean: fs.readFileSync(path.join(__dirname, 'styles/clean.css'), 'utf8')
+  clean: fs.readFileSync(path.join(__dirname, 'styles/clean.css'), 'utf8'),
+  'corporate-ja': fs.readFileSync(path.join(__dirname, 'styles/corporate-ja.css'), 'utf8')
 };
 
 const baseStyles = {
@@ -28,8 +29,11 @@ const mermaidScript = fs.existsSync(mermaidScriptPath)
  */
 function buildHtmlDocument(contentHtml, options = {}) {
   const title = options.title || 'Document';
-  const themeName = (options.theme || 'github').toLowerCase();
-  const themeCss = builtinThemes[themeName] || builtinThemes.github;
+  const themeKey = (options.theme || 'github').toLowerCase();
+  const normalizedTheme = (themeKey === 'japanese' || themeKey === 'japan' || themeKey === 'business-ja')
+    ? 'corporate-ja'
+    : themeKey;
+  const themeCss = builtinThemes[normalizedTheme] || builtinThemes.github;
 
   let customCss = '';
   if (options.css) {

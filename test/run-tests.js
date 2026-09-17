@@ -75,6 +75,17 @@ Page 2 content.
   assert.ok(cleanResult.buffer.length > 3000, 'Clean theme PDF buffer should be valid');
   console.log(`  ✔ Clean business theme successfully compiled into PDF (${cleanResult.buffer.length} bytes)`);
 
+  // Test 6: Corporate Japan Theme Rendering
+  console.log('Test 6: Render Markdown with corporate Japanese business theme');
+  const jaResult = await convert({
+    markdown: '# 御見積書\n\n| 項目 | 金額 |\n| :--- | ---: |\n| クラウド運用費 | ¥100,000 |\n',
+    theme: 'corporate-ja',
+    format: 'A4'
+  });
+  assert.ok(jaResult.buffer, 'Corporate JA theme PDF result should have buffer');
+  assert.ok(jaResult.buffer.length > 3000, 'Corporate JA theme PDF buffer should be valid');
+  console.log('  ✔ Corporate Japanese business theme successfully compiled into PDF (' + jaResult.buffer.length + ' bytes)');
+
   console.log('\n🎉 All tests passed successfully!\n');
 }
 
