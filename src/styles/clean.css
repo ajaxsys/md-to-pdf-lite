@@ -69,19 +69,22 @@ a:hover {
 
 /* Modern Business Table: Booktabs Style (No vertical borders, elegant horizontal rules) */
 table {
-  width: 100%;
+  width: calc(100% - 2px);
+  max-width: calc(100% - 2px);
   border-collapse: collapse;
-  margin: 24px 0;
+  margin: 20px 0;
   font-size: 14px;
   border-top: 2px solid var(--color-border-table);
   border-bottom: 2px solid var(--color-border-table);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 table th {
   font-weight: 600;
   color: var(--color-text-heading);
   text-align: left;
-  padding: 12px 16px;
+  padding: 10px 12px;
   background-color: var(--color-bg-subtle);
   border-top: none;
   border-bottom: 1.5px solid var(--color-border-table);
@@ -91,7 +94,7 @@ table th {
 }
 
 table td {
-  padding: 12px 16px;
+  padding: 10px 12px;
   border-top: none;
   border-bottom: 1px solid var(--color-border-subtle);
   border-left: none;
