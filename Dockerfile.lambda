@@ -1,0 +1,47 @@
+FROM --platform=linux/amd64 public.ecr.aws/lambda/nodejs:20
+
+# 1. Install Chromium shared libraries and CJK fonts
+RUN dnf install -y \
+    nspr \
+    nss \
+    nss-util \
+    atk \
+    cups-libs \
+    libXcomposite \
+    libXcursor \
+    libXdamage \
+    libXext \
+    libXi \
+    libXrandr \
+    libXScrnSaver \
+    libXtst \
+    pango \
+    at-spi2-atk \
+    libXt \
+    alsa-lib \
+    libxshmfence \
+    fontconfig \
+    google-noto-sans-vf-fonts \
+    google-noto-sans-cjk-sc-fonts \
+    google-noto-sans-cjk-jp-fonts \
+    ipa-gothic-fonts \
+    ipa-mincho-fonts \
+    && fc-cache -fv \
+    && dnf clean all
+
+# 2. Configure environment
+ENV NODE_ENV=production \
+    FONTCONFIG_PATH=/etc/fonts
+
+WORKDIR ${LAMBDA_TASK_ROOT}
+
+# 3. Install production dependencies including serverless Chromium
+COPY package*.json ./
+RUN npm ci --omit=dev && npm install --no-save @sparticuz/chromium
+
+# 4. Copy source code and assets
+COPY src/ ./src/
+COPY bin/ ./bin/
+
+# 5. Handler target
+CMD [ "src/lambda-handler.handler" ]

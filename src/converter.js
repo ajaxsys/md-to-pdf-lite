@@ -146,19 +146,25 @@ async function convert(params = {}) {
   fs.writeFileSync(tmpHtmlPath, fullHtml, 'utf8');
 
   // 3. Launch Puppeteer with host Chrome
+  const defaultArgs = [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-gpu',
+    '--disable-dev-shm-usage',
+    '--no-first-run',
+    '--no-zygote',
+    '--allow-file-access-from-files',
+    '--disable-web-security'
+  ];
+  const launchArgs = Array.isArray(params.puppeteerArgs) && params.puppeteerArgs.length > 0
+    ? params.puppeteerArgs
+    : defaultArgs;
+
   const browser = await puppeteer.launch({
     executablePath: chromePath,
-    headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--no-first-run',
-      '--no-zygote',
-      '--allow-file-access-from-files',
-      '--disable-web-security'
-    ]
+    headless: params.headless !== undefined ? params.headless : true,
+    args: launchArgs,
+    dumpio: Boolean(process.env.DEBUG || process.env.AWS_LAMBDA_FUNCTION_NAME)
   });
 
   try {

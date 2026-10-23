@@ -1,0 +1,16 @@
+{
+  "name": "md-to-pdf-infra",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@pulumi/aws": "^6.60.0",
+    "@pulumi/awsx": "^2.19.0",
+    "@pulumi/pulumi": "^3.140.0",
+    "mime-types": "^2.1.35"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^2.1.4",
+    "@types/node": "^20.17.0",
+    "typescript": "^5.6.3"
+  }
+}

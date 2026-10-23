@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>md-to-pdf Studio | Serverless CJK PDF Generator</title>
+  <meta name="description" content="Commercial-grade Markdown to PDF converter with CJK typography, KaTeX formula support, and serverless acceleration." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <div id="app" class="app-layout">
+    <!-- Top Header -->
+    <header class="studio-header">
+      <div class="header-brand">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 id="app-title">md-to-pdf studio</h1>
+          <span id="app-badge" class="badge-serverless">Serverless Lite</span>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="header-controls">
+        <!-- Language Switcher -->
+        <div class="control-item">
+          <select id="lang-select" class="select-pill" aria-label="Select Language">
+            <option value="en">🇺🇸 English</option>
+            <option value="zh-CN">🇨🇳 简体中文</option>
+            <option value="ja">🇯🇵 日本語</option>
+          </select>
+        </div>
+
+        <!-- Theme Picker -->
+        <div class="control-item">
+          <label id="theme-label" for="theme-select" class="control-label">Theme</label>
+          <select id="theme-select" class="select-pill">
+            <option value="clean" selected>Clean Business</option>
+            <option value="corporate-ja">Corporate Navy (JA)</option>
+            <option value="github">GitHub Tech</option>
+          </select>
+        </div>
+
+        <!-- Paper Size -->
+        <div class="control-item">
+          <label id="format-label" for="format-select" class="control-label">Size</label>
+          <select id="format-select" class="select-pill">
+            <option value="A4" selected>A4</option>
+            <option value="Letter">Letter</option>
+            <option value="A3">A3</option>
+            <option value="Legal">Legal</option>
+          </select>
+        </div>
+
+        <!-- Orientation Toggle -->
+        <div class="control-item">
+          <button id="orientation-toggle" class="btn-ghost" title="Toggle Orientation">
+            <span id="orientation-text">Portrait</span>
+          </button>
+        </div>
+
+        <!-- Export PDF Main CTA -->
+        <button id="btn-export-pdf" class="btn-primary">
+          <svg class="icon-download" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span id="export-btn-text">Export PDF</span>
+          <span class="spinner" id="export-spinner" style="display: none;"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Toolbar for Formatting -->
+    <div class="editor-toolbar" id="editor-toolbar">
+      <div class="toolbar-group">
+        <button id="tool-bold" class="tool-btn" title="Bold (Ctrl+B)"><b>B</b></button>
+        <button id="tool-italic" class="tool-btn" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button id="tool-strike" class="tool-btn" title="Strikethrough"><s>S</s></button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group">
+        <button id="tool-h1" class="tool-btn" title="Heading 1">H1</button>
+        <button id="tool-h2" class="tool-btn" title="Heading 2">H2</button>
+        <button id="tool-h3" class="tool-btn" title="Heading 3">H3</button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group">
+        <button id="tool-bullet" class="tool-btn" title="Bullet List">• List</button>
+        <button id="tool-ordered" class="tool-btn" title="Numbered List">1. List</button>
+        <button id="tool-quote" class="tool-btn" title="Blockquote">“”</button>
+        <button id="tool-code" class="tool-btn" title="Code Block">&lt;/&gt;</button>
+        <button id="tool-table" class="tool-btn" title="Insert Table">▦ Table</button>
+      </div>
+
+      <div class="toolbar-spacer"></div>
+
+      <!-- Mode & Utility Group -->
+      <div class="toolbar-group">
+        <button id="btn-load-sample" class="btn-subtle" title="Load sample document">
+          <span id="load-sample-text">Load Sample</span>
+        </button>
+        
+        <div class="mode-switch">
+          <button id="mode-visual" class="mode-btn active">Visual</button>
+          <button id="mode-raw" class="mode-btn">Markdown</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workspace Main Panel -->
+    <main class="editor-workspace">
+      <!-- Visual TipTap Editor Surface -->
+      <div id="tiptap-container" class="editor-surface"></div>
+
+      <!-- Raw Markdown Textarea (Synchronized) -->
+      <textarea id="raw-markdown-editor" class="raw-markdown-surface" style="display: none;" spellcheck="false" placeholder="Write or paste Markdown here..."></textarea>
+    </main>
+
+    <!-- Footer Status Bar -->
+    <footer class="studio-footer">
+      <div class="footer-stats">
+        <span id="stat-words">0 words</span>
+        <span class="stat-bullet">•</span>
+        <span id="stat-chars">0 characters</span>
+        <span class="stat-bullet">•</span>
+        <span id="stat-pages">~1 page</span>
+      </div>
+
+      <div class="footer-info">
+        <span class="status-indicator"></span>
+        <span id="footer-status-text">Ready · Puppeteer Serverless Engine</span>
+      </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notification"></div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

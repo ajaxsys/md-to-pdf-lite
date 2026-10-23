@@ -1,0 +1,3 @@
+name: md-to-pdf-lite-infra
+runtime: nodejs
+description: Serverless Markdown to PDF CloudFront, S3 and Lambda deployment

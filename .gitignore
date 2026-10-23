@@ -13,3 +13,8 @@ yarn-error.log*
 .idea/
 output/
 output-pdfs/
+web/dist/
+web/node_modules/
+infra/node_modules/
+infra/bin/
+.pulumi/
