@@ -6,7 +6,7 @@
 
 ## 1. CJK Typography & Multilingual Support
 
-本项目针对中日韩（CJK）字体、排版与标点间距进行了深度优化：
+This project provides deep optimization for Chinese, Japanese, and Korean (CJK) fonts, typography, and punctuation spacing:
 
 - **中文 (Simplified & Traditional)**: 优雅的苹方（PingFang SC）与微软雅黑，字距清晰，行高舒适。
 - **日本語 (Japanese)**: ヒラギノ角ゴ (Hiragino Sans) および メイリオ (Meiryo) に最適化された美しいビジネス文書組版。

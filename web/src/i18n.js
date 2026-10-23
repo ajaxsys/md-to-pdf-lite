@@ -3,6 +3,10 @@
  * Auto-detects browser locale and persists user selection in localStorage.
  */
 
+import sampleEn from '@examples/sample.md?raw';
+import sampleZh from '@examples/sample.zh-CN.md?raw';
+import sampleJa from '@examples/sample.ja.md?raw';
+
 export const translations = {
   en: {
     appTitle: 'md-to-pdf studio',
@@ -28,48 +32,7 @@ export const translations = {
     successToast: 'PDF downloaded successfully!',
     errorToast: 'PDF generation failed. Please check your content.',
     emptyWarning: 'Document is empty. Please enter some text.',
-    sampleDoc: `# Executive Project Proposal
-
-> **Version**: 1.0.0 | **Author**: Antigravity Studio | **Date**: 2026-10-24
-
----
-
-## 1. Executive Summary
-
-This proposal outlines the deployment and benefits of **md-to-pdf-lite**, an ultra-lightweight, zero-Chromium-bundle PDF generation engine running directly on modern cloud infrastructure.
-
-### Key Highlights
-- **100% Privacy & Offline Rendering**: No sensitive data leaks to third-party online converters.
-- **Superior Typography**: Automatic font fallback across Latin, Chinese, and Japanese scripts.
-- **Cost Effective**: Serverless design ensures minimal running costs.
-
----
-
-## 2. Infrastructure Comparison
-
-| Platform | Cold Start | Concurrency | Monthly Free Tier |
-| :--- | :--- | :--- | :--- |
-| **AWS Lambda + CloudFront** | ~1.8s (Warm: 0s) | Elastic (1000+) | 400,000 GB-seconds |
-| **Traditional PaaS** | 30s - 60s | 1 instance (OOM risk) | 750 hours (15min idle sleep) |
-| **Dedicated VPS** | 0s | Fixed capacity | \$5 - \$20 / month |
-
----
-
-## 3. Implementation Timeline
-
-- [x] High-performance Puppeteer Lambda handler
-- [x] CJK Noto Sans & IPA Gothic enterprise fonts
-- [x] TipTap trilingual markdown editor
-- [ ] Custom domain DNS verification
-
-\`\`\`bash
-# CLI test command
-curl -X POST https://your-service.cloudfront.net/api/convert \\
-  -H "Content-Type: application/json" \\
-  -d '{"markdown": "# Hello World"}' \\
-  --output result.pdf
-\`\`\`
-`
+    sampleDoc: sampleEn
   },
   'zh-CN': {
     appTitle: 'md-to-pdf 工作台',
@@ -95,48 +58,7 @@ curl -X POST https://your-service.cloudfront.net/api/convert \\
     successToast: 'PDF 已成功生成并开始下载！',
     errorToast: '导出失败，请检查输入或重试。',
     emptyWarning: '文档内容为空，请输入内容后再试。',
-    sampleDoc: `# 技术架构与实施方案
-
-> **文档版本**: 1.0.0 | **架构师**: 技术方案组 | **签署日期**: 2026-10-24
-
----
-
-## 一、方案背景与目标
-
-传统在线 Markdown 转 PDF 工具普遍存在**数据安全泄露风险**以及中日韩文字发虚、表格跨页腰斩等排版硬伤。
-
-本项目依托 **AWS Lambda + CloudFront + Chromium** 打造私有化 Serverless 渲染引擎：
-- 🛡️ **高私密性**：数据不落第三方服务器，生成完即刻释放；
-- 🖋️ **顶级 CJK 排版**：原生支持思源黑体（Noto Sans CJK）、微软雅黑、苹方，字距舒适；
-- ⚡ **极致响应**：毫秒级加载与极速单实例渲染。
-
----
-
-## 二、部署模式性能对比表
-
-| 架构选型 | 冷启动延时 | 并发能力 | 每月免费额度 | 综合评价 |
-| :--- | :--- | :--- | :--- | :--- |
-| **AWS Lambda (本架构)** | 约 1.8 秒 (预热 0s) | 千级瞬时弹性扩容 | 400,000 GB-秒 | ⭐⭐⭐⭐⭐ **最优解** |
-| **传统单容器 PaaS** | 30 ~ 60 秒冷唤醒 | 仅单实例 (极易 OOM) | 750 小时 (闲置休眠) | ⭐⭐ 玩具级可用 |
-| **传统独立虚拟机** | 0 秒 (24h常开) | 受限于固定配置 | 无 (固定月租费用) | ⭐⭐⭐ 成本偏高 |
-
----
-
-## 三、关键交付里程碑
-
-- [x] 完成容器化 Chromium + CJK 字体深度适配
-- [x] 封装 Lambda Function URL 高性能无头流式传输
-- [x] 开发 TipTap 中英日三语多模式在线编辑器
-- [ ] 接入独立域名并完成 CloudFront 全球加速
-
-\`\`\`bash
-# 外部系统 API 快速调用
-curl -X POST https://your-service.cloudfront.net/api/convert \\
-  -H "Content-Type: application/json" \\
-  -d '{"markdown": "# 自动化生成测试", "theme": "clean"}' \\
-  -o 报表.pdf
-\`\`\`
-`
+    sampleDoc: sampleZh
   },
   ja: {
     appTitle: 'md-to-pdf スタジオ',
@@ -162,49 +84,7 @@ curl -X POST https://your-service.cloudfront.net/api/convert \\
     successToast: 'PDF の出力が完了しました！',
     errorToast: 'PDF 出力に失敗しました。再試行してください。',
     emptyWarning: 'ドキュメントが空です。テキストを入力してください。',
-    sampleDoc: `# 新規クラウド基盤 移行提案書
-
-> **文書番号**: PR-2026-1024 | **作成者**: システム推進部 | **作成日**: 2026年10月24日
-
----
-
-## 1. 提案の目的
-
-本提案は、社内技術文書・仕様書の自動PDF組版基盤を **AWS Lambda + CloudFront** を用いた完全サーバーレス構成へ刷新し、**情報漏洩リスクの完全排除**と**高品質な日本語印刷表現**を両立することを目的とします。
-
-### 本方式の主要メリット
-- 🔒 **情報漏洩ゼロ**: 外部SaaS変換サービスへの機密文書アップロードを防止
-- 📖 **端麗な日本語組版**: Noto Sans CJK / IPAゴシックによる文字化け・罫線欠損の防止
-- 💰 **大幅な運用コスト削減**: リクエスト時のみ起動し、月間数十万回まで実質無償
-
----
-
-## 2. 方式別 比較評価表
-
-| 評価項目 | AWS Lambda (採用方式) | 一般的な PaaS (無料枠) | 仮想専用サーバ (VPS) |
-| :--- | :--- | :--- | :--- |
-| **起動特性** | コールド約1.8秒 / 保活時即時 | 休眠復帰に 30〜60 秒要 | 常時稼働 (0秒) |
-| **同時実行性** | 自動スケール (1,000+) | 1並行でメモリ枯渇 (OOM) | サーバ性能に依存 |
-| **月間維持費** | **0 円** (無償枠内運用) | 0 円 (ただし制限多数) | 月額 1,000〜3,000 円 |
-| **日本語対応** | **標準完全対応** | 手動設定が必要 | 手動設定が必要 |
-
----
-
-## 3. 実施タスク・マイルストーン
-
-- [x] Lambda 最適化 Chromium コンテナ環境の構築
-- [x] IPAゴシック・Noto Sans 日本語フォント統合
-- [x] TipTap ベースの 3言語対応 高機能エディタUI実装
-- [ ] 独自ドメイン及び CloudFront CDN 配信設定
-
-\`\`\`bash
-# API 経由での自動化実行例
-curl -X POST https://your-service.cloudfront.net/api/convert \\
-  -H "Content-Type: application/json" \\
-  -d '{"markdown": "# 日報レポート\\n\\n本日業務完了", "theme": "corporate-ja"}' \\
-  -o 業務日報.pdf
-\`\`\`
-`
+    sampleDoc: sampleJa
   }
 };
 

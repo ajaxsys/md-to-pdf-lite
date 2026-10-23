@@ -25,10 +25,14 @@ RUN dnf install -y \
     google-noto-sans-cjk-sc-fonts \
     google-noto-sans-cjk-jp-fonts \
     google-noto-emoji-color-fonts \
-    ipa-gothic-fonts \
-    ipa-mincho-fonts \
+    && rm -f /usr/share/fonts/google-noto-cjk/*-Thin.otf \
+             /usr/share/fonts/google-noto-cjk/*-Light.otf \
+             /usr/share/fonts/google-noto-cjk/*-DemiLight.otf \
+             /usr/share/fonts/google-noto-cjk/*-Medium.otf \
+             /usr/share/fonts/google-noto-cjk/*-Black.otf \
     && fc-cache -fv \
-    && dnf clean all
+    && dnf clean all \
+    && rm -rf /var/cache/dnf /var/log/* /tmp/*
 
 # 2. Configure environment
 ENV NODE_ENV=production \
@@ -38,7 +42,9 @@ WORKDIR ${LAMBDA_TASK_ROOT}
 
 # 3. Install production dependencies including serverless Chromium
 COPY package*.json ./
-RUN npm ci --omit=dev && npm install --no-save @sparticuz/chromium
+RUN npm ci --omit=dev --no-audit --no-fund \
+    && npm install --no-save @sparticuz/chromium \
+    && rm -rf /root/.npm
 
 # 4. Copy source code and assets
 COPY src/ ./src/
