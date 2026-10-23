@@ -43,6 +43,7 @@
     "highlight.js": "^11.11.1",
     "katex": "^0.16.21",
     "markdown-it": "^14.1.0",
+    "markdown-it-task-lists": "^2.1.1",
     "picocolors": "^1.1.1",
     "puppeteer-core": "^24.4.0"
   }

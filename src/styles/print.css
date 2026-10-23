@@ -54,7 +54,12 @@
     word-break: break-all;
   }
 
-  tr, pre, blockquote, .katex-display, .mermaid {
+  tr, pre, blockquote, .katex-display, .mermaid, .contains-task-list, ul.task-list {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  li {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }

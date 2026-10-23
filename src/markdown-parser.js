@@ -3,6 +3,7 @@ const path = require('path');
 const url = require('url');
 const MarkdownIt = require('markdown-it');
 const markdownItKatex = require('@vscode/markdown-it-katex').default || require('@vscode/markdown-it-katex');
+const taskLists = require('markdown-it-task-lists');
 const hljs = require('highlight.js');
 
 const MIME_TYPES = {
@@ -80,6 +81,13 @@ function createParser() {
     throwOnError: false,
     errorColor: '#cc0000',
     strict: 'ignore'
+  });
+
+  // Enable GitHub-flavored task lists with checkboxes (- [x] and - [ ])
+  md.use(taskLists, {
+    enabled: false,
+    label: true,
+    labelAfter: true
   });
 
   return md;
