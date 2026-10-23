@@ -203,11 +203,12 @@ exports.handler = async (event, context) => {
       isBase64Encoded: true,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="${encodeURIComponent(filename)}"`,
+        'Content-Disposition': `attachment; filename="${encodeURIComponent(filename)}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key, x-pow-timestamp, x-pow-nonce'
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key, x-pow-timestamp, x-pow-nonce',
+        'Access-Control-Expose-Headers': 'Content-Disposition, Content-Type'
       },
       body: Buffer.from(buffer).toString('base64')
     };

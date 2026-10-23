@@ -5,6 +5,8 @@ import Table from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
 import Placeholder from '@tiptap/extension-placeholder';
 
 import { translations, getInitialLanguage, setLanguage } from './i18n.js';
@@ -65,6 +67,10 @@ function initEditor() {
       TableRow,
       TableHeader,
       TableCell,
+      TaskList,
+      TaskItem.configure({
+        nested: true
+      }),
       Placeholder.configure({
         placeholder: 'Start writing your document in Markdown...'
       })
@@ -269,12 +275,17 @@ async function handleExportPDF() {
   exportSpinner.style.display = 'inline-block';
 
   try {
+    // Smart filename: derive from first H1 heading or timestamp fallback
+    const titleMatch = markdown.match(/^#\s+(.+)$/m);
+    const safeTitle = titleMatch ? titleMatch[1].replace(/[\\/:*?"<>|#]/g, '').trim().slice(0, 50) : '';
+    const filename = safeTitle ? `${safeTitle}.pdf` : `document-${Date.now()}.pdf`;
+
     const payload = {
       markdown,
       theme: themeSelect.value,
       format: formatSelect.value,
       landscape: isLandscape,
-      filename: `document-${Date.now()}.pdf`
+      filename
     };
 
     // Solve lightweight Proof of Work challenge (~50-90ms)
@@ -308,14 +319,23 @@ async function handleExportPDF() {
     }
 
     const blob = await response.blob();
-    const downloadUrl = window.URL.createObjectURL(blob);
+    const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+    const downloadUrl = window.URL.createObjectURL(pdfBlob);
+    
     const a = document.createElement('a');
+    a.style.display = 'none';
     a.href = downloadUrl;
-    a.download = payload.filename;
+    a.download = filename;
+    a.setAttribute('download', filename);
     document.body.appendChild(a);
     a.click();
-    a.remove();
-    window.URL.revokeObjectURL(downloadUrl);
+
+    // Critical: Do NOT revoke URL immediately synchronously!
+    // Chrome's download engine needs a brief moment to register the blob URL and filename.
+    setTimeout(() => {
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    }, 3000);
 
     showToast(t.successToast, 'success');
   } catch (err) {
