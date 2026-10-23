@@ -24,6 +24,7 @@ RUN dnf install -y \
     google-noto-sans-vf-fonts \
     google-noto-sans-cjk-sc-fonts \
     google-noto-sans-cjk-jp-fonts \
+    google-noto-emoji-color-fonts \
     ipa-gothic-fonts \
     ipa-mincho-fonts \
     && fc-cache -fv \

@@ -4,8 +4,8 @@
 }
 
 :root {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans", "Microsoft YaHei", "Meiryo", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "DejaVu Sans Mono", "PingFang SC", "Hiragino Sans", "Microsoft YaHei", "Noto Sans CJK SC", monospace;
+  --font-sans: "Noto Sans CJK SC", "Noto Sans CJK JP", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans", "Microsoft YaHei", "Meiryo", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "DejaVu Sans Mono", "Noto Sans CJK SC", "PingFang SC", "Hiragino Sans", "Microsoft YaHei", monospace;
   --color-text-main: #2d3748;
   --color-text-heading: #1a202c;
   --color-primary: #0969da;
