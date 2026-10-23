@@ -264,16 +264,23 @@ img {
 }
 
 /* Mermaid vector diagrams */
-.mermaid {
+.mermaid,
+pre.mermaid {
   text-align: center;
   margin: 22px 0;
-  background: transparent;
-  border: none;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  color: inherit !important;
   overflow: visible;
+  padding: 0 !important;
+  box-shadow: none !important;
 }
 
-.mermaid svg {
+.mermaid svg,
+pre.mermaid svg {
   max-width: 100%;
   height: auto;
   display: inline-block;
 }
+

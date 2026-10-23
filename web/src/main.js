@@ -8,9 +8,25 @@ import TableHeader from '@tiptap/extension-table-header';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import Placeholder from '@tiptap/extension-placeholder';
+import { lowlight } from 'lowlight';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 
+import { MermaidNodeView, StandardCodeBlockNodeView } from './mermaid-node-view.js';
 import { translations, getInitialLanguage, setLanguage } from './i18n.js';
 import { solveProofOfWork } from './pow.js';
+
+const CustomCodeBlock = CodeBlockLowlight.extend({
+  addNodeView() {
+    return ({ node, view, getPos }) => {
+      if (node.attrs.language === 'mermaid') {
+        return new MermaidNodeView(node, view, getPos);
+      }
+      return new StandardCodeBlockNodeView(node, view, getPos);
+    };
+  }
+});
+
+
 
 // App State
 let currentLang = getInitialLanguage();
@@ -74,7 +90,12 @@ function initEditor() {
     element: tiptapContainer,
     extensions: [
       StarterKit.configure({
-        heading: { levels: [1, 2, 3, 4] }
+        heading: { levels: [1, 2, 3, 4] },
+        codeBlock: false
+      }),
+      CustomCodeBlock.configure({
+        lowlight,
+        defaultLanguage: 'plaintext'
       }),
       Markdown.configure({
         html: true,
@@ -399,6 +420,18 @@ document.addEventListener('DOMContentLoaded', () => {
       loadDocumentContent(t.sampleDoc);
     }
   });
+
+  // Theme Select Handler to synchronize WYSIWYG surface styles with selected PDF theme
+  function updateThemeClass(theme) {
+    if (!tiptapContainer) return;
+    tiptapContainer.classList.remove('theme-clean', 'theme-corporate-ja', 'theme-github');
+    tiptapContainer.classList.add(`theme-${theme}`);
+  }
+
+  themeSelect.addEventListener('change', (e) => {
+    updateThemeClass(e.target.value);
+  });
+  updateThemeClass(themeSelect.value);
 
   // Orientation Toggle
   const orientationIcon = document.getElementById('orientation-icon');
