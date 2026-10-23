@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "Ultra-lightweight, zero-chromium-bundle Markdown to PDF converter with CJK typography, KaTeX, and CI/CD support.",
   "main": "src/index.js",
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "README*.md"
+  ],
   "bin": {
     "md-to-pdf-lite": "bin/cli.js",
     "md2pdf-lite": "bin/cli.js"

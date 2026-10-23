@@ -17,6 +17,8 @@ let currentLang = getInitialLanguage();
 let currentMode = 'visual'; // 'visual' | 'raw'
 let isLandscape = false;
 let editor = null;
+let hasUserEdited = false;
+let isProgrammatic = false;
 
 // DOM Elements
 const tiptapContainer = document.getElementById('tiptap-container');
@@ -45,6 +47,22 @@ const appBadge = document.getElementById('app-badge');
 const themeLabel = document.getElementById('theme-label');
 const formatLabel = document.getElementById('format-label');
 const loadSampleText = document.getElementById('load-sample-text');
+
+/**
+ * Load markdown content into both visual and raw editors
+ */
+function loadDocumentContent(markdown) {
+  isProgrammatic = true;
+  if (editor) {
+    editor.commands.setContent(markdown);
+  }
+  rawTextarea.value = markdown;
+  hasUserEdited = false;
+  updateStats();
+  setTimeout(() => {
+    isProgrammatic = false;
+  }, 50);
+}
 
 /**
  * Initialize TipTap Editor instance
@@ -77,6 +95,9 @@ function initEditor() {
     ],
     content: t.sampleDoc,
     onUpdate: () => {
+      if (!isProgrammatic) {
+        hasUserEdited = true;
+      }
       updateStats();
       syncToRawIfActive();
     }
@@ -84,8 +105,10 @@ function initEditor() {
 
   // Set initial raw content
   rawTextarea.value = t.sampleDoc;
+  hasUserEdited = false;
   updateStats();
 }
+
 
 /**
  * Update word, character and page estimates
@@ -242,19 +265,19 @@ function setupToolbar() {
 
   btnLoadSample.addEventListener('click', () => {
     const t = translations[currentLang];
-    if (currentMode === 'visual') {
-      editor.commands.setContent(t.sampleDoc);
-    } else {
-      rawTextarea.value = t.sampleDoc;
-    }
-    updateStats();
+    loadDocumentContent(t.sampleDoc);
     showToast(currentLang === 'zh-CN' ? '已重新载入示例模板' : currentLang === 'ja' ? 'サンプルを読み込みました' : 'Sample document loaded');
   });
 
   modeVisual.addEventListener('click', () => switchMode('visual'));
   modeRaw.addEventListener('click', () => switchMode('raw'));
 
-  rawTextarea.addEventListener('input', () => updateStats());
+  rawTextarea.addEventListener('input', () => {
+    if (!isProgrammatic) {
+      hasUserEdited = true;
+    }
+    updateStats();
+  });
 }
 
 /**
@@ -356,7 +379,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Language Select
   langSelect.addEventListener('change', (e) => {
-    applyLocalization(e.target.value);
+    const newLang = e.target.value;
+    const t = translations[newLang];
+
+    if (hasUserEdited) {
+      const confirmMsg = newLang === 'zh-CN'
+        ? '切换语言将载入对应的示例模板，当前编辑内容将被覆盖，是否继续？'
+        : newLang === 'ja'
+        ? '言語を切り替えるとサンプル文書が再読込され、現在の編集内容が上書きされます。よろしいですか？'
+        : 'Switching language will load the localized sample and overwrite current changes. Continue?';
+      if (!confirm(confirmMsg)) {
+        applyLocalization(newLang);
+        return;
+      }
+    }
+
+    applyLocalization(newLang);
+    if (t && t.sampleDoc) {
+      loadDocumentContent(t.sampleDoc);
+    }
   });
 
   // Orientation Toggle
