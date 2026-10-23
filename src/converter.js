@@ -190,6 +190,7 @@ async function convert(params = {}) {
       format: params.format || 'A4',
       landscape: Boolean(params.landscape),
       printBackground: true,
+      tagged: params.tagged !== undefined ? Boolean(params.tagged) : false,
       margin: params.margin || {
         top: '15mm',
         right: '12mm',

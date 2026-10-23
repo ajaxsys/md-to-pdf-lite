@@ -20,6 +20,7 @@ program
   .option('-c, --css <styles>', 'Custom inline CSS rules')
   .option('-l, --landscape', 'Use landscape orientation', false)
   .option('--chrome <path>', 'Path to Chrome/Chromium executable')
+  .option('--tagged', 'Generate tagged accessible PDF (increases file size)', false)
   .option('--check-env', 'Check environment and detected Chrome path')
   .action(async (files, options) => {
     // 1. Environment check mode
@@ -94,7 +95,8 @@ program
           landscape: options.landscape,
           css: options.css,
           stylesheet: options.stylesheet,
-          executablePath: chromePath
+          executablePath: chromePath,
+          tagged: options.tagged
         });
 
         const elapsed = ((Date.now() - fileStart) / 1000).toFixed(1);
