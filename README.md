@@ -2,7 +2,16 @@
 
 > **Ultra-lightweight, zero-chromium-bundle Markdown to PDF engine. Optimized for CJK typography, with native support for offline Mermaid vector diagrams, KaTeX formulas, syntax highlighting, and CI/CD pipelines.**
 
-[English](README.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
+<p align="center">
+  <a href="https://d3gwzeb0uub1l.cloudfront.net/"><img src="https://img.shields.io/badge/⚡_Live_Demo-Web_Studio-3b82f6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo"></a>
+  <a href="#-deploy-to-your-own-aws-cloud-1-click--serverless"><img src="https://img.shields.io/badge/☁️_Deploy_to-AWS_Serverless-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white" alt="Deploy to AWS"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge" alt="License"></a>
+  <a href="#-security--anti-bot-architecture-pow--private-key"><img src="https://img.shields.io/badge/Shield-PoW_Protected-8b5cf6?style=for-the-badge" alt="PoW Protected"></a>
+</p>
+
+<p align="center">
+  <a href="README.md"><b>English</b></a> | <a href="README.zh-CN.md"><b>简体中文</b></a> | <a href="README.ja.md"><b>日本語</b></a>
+</p>
 
 ---
 
@@ -198,6 +207,33 @@ jobs:
 | `-s, --stylesheet` | `stylesheet` | `undefined` | Path to custom external CSS file |
 | `-c, --css` | `css` | `undefined` | Custom inline CSS string |
 | `--chrome` | `executablePath` | *Auto-detected* | Custom Chrome/Chromium executable path |
+
+---
+
+## ☁️ Deploy to your own AWS Cloud (1-Click & Serverless)
+
+For strict corporate compliance, financial institutions, and medical environments where data must **never touch third-party servers**, you can deploy your own private instance of `md-to-pdf-lite` to AWS in 2 minutes:
+
+### Architecture
+- **AWS Lambda** (1536 MB, Chromium + CJK Noto Fonts + Puppeteer Core)
+- **Amazon CloudFront** + **Amazon S3** (Hosting the trilingual TipTap Web Studio)
+- **Dual-Channel Security**: Client-side **Proof-of-Work (PoW)** for web visitors + **Private API Key** bypass for your CLI/CI/CD.
+- **Cost**: ~$0.00 / month (100% covered within AWS Always-Free Tier for up to 170,000 document conversions/month).
+
+### 🚀 Instant Deployment Steps
+```bash
+# 1. Clone this repository
+git clone https://github.com/ajaxsys/md-to-pdf-lite.git
+cd md-to-pdf-lite
+
+# 2. Configure environment
+cp .env.example .env
+# Set your PRIVATE_API_KEY in .env
+
+# 3. Deploy everything in one command
+./deploy.sh
+```
+The script will build the Docker container on Amazon ECR, provision the Lambda and CloudFront distribution, and output your live CDN URL!
 
 ---
 

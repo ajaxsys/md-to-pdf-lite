@@ -2,7 +2,16 @@
 
 > **Chromiumを内包しない超軽量設計のモダン Markdown to PDF コンバーター。日本語（CJK）の美しい商用組版、Mermaid ベクター図、KaTeX 数式、コードハイライト、CI/CD 自動化に完全対応。**
 
-[English](README.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
+<p align="center">
+  <a href="https://d3gwzeb0uub1l.cloudfront.net/"><img src="https://img.shields.io/badge/⚡_オンライン体験-Web_スタジオ-3b82f6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="オンライン体験"></a>
+  <a href="#-自社-aws-への-1-click-サーバーレス-プライベートデプロイ"><img src="https://img.shields.io/badge/☁️_自社デプロイ-AWS_Serverless-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white" alt="AWSへデプロイ"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge" alt="License"></a>
+  <a href="#-セキュリティbot防止アーキテクチャpow--プライベートキー"><img src="https://img.shields.io/badge/防御-PoW_計算証明対応-8b5cf6?style=for-the-badge" alt="PoW 防御"></a>
+</p>
+
+<p align="center">
+  <a href="README.md"><b>English</b></a> | <a href="README.zh-CN.md"><b>简体中文</b></a> | <a href="README.ja.md"><b>日本語</b></a>
+</p>
 
 ---
 
@@ -201,6 +210,34 @@ jobs:
 
 ---
 
+## ☁️ 自社 AWS への 1-Click サーバーレス プライベートデプロイ
+
+社内コンプライアンスや機密保持要件により**ドキュメントを外部の第三者サーバーへアップロードすることが禁じられている**企業や医療・金融機関向けに、自社の AWS アカウント配下へわずか 2 分で完全プライベートな Serverless 変換環境を構築できます：
+
+### アーキテクチャの強み
+- **AWS Lambda** (1536 MB メモリ、Chromium + Noto Sans CJK 日本語フォント一式 + カラー絵文字を標準内包)
+- **Amazon CloudFront** + **Amazon S3** (3言語対応 TipTap Web スタジオの静的ホスティング＆グローバル CDN 配信)
+- **デュアルチャネル・セキュリティ**: Web 訪問者向けの**クライアント側 PoW (工作量証明)**（Bot やクローラーによるスパムを完全防御） + CLI/CI/CD 向けの **Private API Key** による即時パス
+- **圧倒的な低コスト**: AWS 常時無料枠（Always-Free Tier）の範囲内で毎月最大 17 万ドキュメントまで追加料金なしで利用可能（待機コストは **完全0円**）
+
+### 🚀 ワンステップ簡単デプロイ手順
+```bash
+# 1. 本リポジトリをクローン
+git clone https://github.com/ajaxsys/md-to-pdf-lite.git
+cd md-to-pdf-lite
+
+# 2. 環境変数の設定
+cp .env.example .env
+# .env 内に独自の PRIVATE_API_KEY を設定
+
+# 3. コマンド1発で全自動デプロイ
+./deploy.sh
+```
+デプロイスクリプトが Amazon ECR へのコンテナビルド、Lambda 関数、CloudFront CDN の構築をすべて自動で行い、完了時に社内専用の CloudFront URL を表示します！
+
+---
+
 ## 📄 ライセンス
 
 MIT License © 2026 ajaxsys
+

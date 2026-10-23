@@ -2,7 +2,16 @@
 
 > **超轻量、零 Chromium 捆绑包的现代 Markdown 转 PDF 引擎。深度优化中日韩（CJK）排版美学，原生支持 Mermaid 矢量图表、KaTeX 公式、代码高亮与自动化 CI/CD 流水线。**
 
-[English](README.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
+<p align="center">
+  <a href="https://d3gwzeb0uub1l.cloudfront.net/"><img src="https://img.shields.io/badge/⚡_在线体验-Web_工作台-3b82f6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="在线体验"></a>
+  <a href="#-一键部署至您自有的-aws-云端serverless-私有化"><img src="https://img.shields.io/badge/☁️_一键部署-AWS_Serverless-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white" alt="一键部署至 AWS"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge" alt="License"></a>
+  <a href="#-安全防刷架构pow-工作量证明--私钥通道"><img src="https://img.shields.io/badge/防御-PoW_工作量证明-8b5cf6?style=for-the-badge" alt="PoW 防御"></a>
+</p>
+
+<p align="center">
+  <a href="README.md"><b>English</b></a> | <a href="README.zh-CN.md"><b>简体中文</b></a> | <a href="README.ja.md"><b>日本語</b></a>
+</p>
 
 ---
 
@@ -198,6 +207,33 @@ jobs:
 | `-s, --stylesheet` | `stylesheet` | `undefined` | 自定义外部 CSS 样式表路径 |
 | `-c, --css` | `css` | `undefined` | 自定义内联 CSS 字符串 |
 | `--chrome` | `executablePath` | *自动嗅探* | 指定 Chrome/Chromium 二进制程序路径 |
+
+---
+
+## ☁️ 一键部署至您自有的 AWS 云端（Serverless 私有化）
+
+针对有严格合规与数据安全要求的企业、医疗或金融场景，若**严禁将文档上传至任何第三方云服务**，您只需 2 分钟即可在自有的 AWS 账号下完成整套 Serverless 架构的一键私有化交付：
+
+### 架构优势
+- **AWS Lambda**（1536 MB 规格，预置 Chromium + 思源黑体 CJK 全套字体 + 彩色 Emoji）；
+- **Amazon CloudFront** + **Amazon S3**（全球 CDN 加速托管三语 Web 工作台）；
+- **双通道安全机制**：前端访客走无感 **PoW 工作量证明**（彻底免疫爬虫盲刷），本地 CLI/脚本走 **Private API Key** 极速免校验直通；
+- **极低运行成本**：日常使用完全落在 AWS 永久免费额度（Free Tier）内，每月可免费转换高达 17 万次，闲置时 **0 元**。
+
+### 🚀 极速部署指引
+```bash
+# 1. 克隆本仓库
+git clone https://github.com/ajaxsys/md-to-pdf-lite.git
+cd md-to-pdf-lite
+
+# 2. 准备环境变量配置
+cp .env.example .env
+# 在 .env 中配置您的专属 PRIVATE_API_KEY
+
+# 3. 一键自动化部署
+./deploy.sh
+```
+部署脚本将自动构建 Docker 镜像、创建 ECR 仓库、部署 Lambda 函数并分发 CloudFront CDN，完成后直接输出可供团队内部访问的 CDN 专属地址！
 
 ---
 
