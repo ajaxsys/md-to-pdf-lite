@@ -4,10 +4,20 @@ import * as awsx from "@pulumi/awsx";
 import * as path from "path";
 import * as fs from "fs";
 import * as mime from "mime-types";
+import * as dotenv from "dotenv";
+
+// Load root .env if present
+const rootEnvPath = path.resolve(__dirname, "../.env");
+if (fs.existsSync(rootEnvPath)) {
+  dotenv.config({ path: rootEnvPath });
+}
 
 const config = new pulumi.Config();
-const memorySize = config.getNumber("memorySize") || 1536; // 1.5GB
-const timeout = config.getNumber("timeout") || 60; // 60 seconds
+const memorySize = config.getNumber("memorySize") || Number(process.env.LAMBDA_MEMORY_SIZE) || 1536; // 1.5GB
+const timeout = config.getNumber("timeout") || Number(process.env.LAMBDA_TIMEOUT) || 60; // 60 seconds
+const privateApiKey = process.env.PRIVATE_API_KEY || process.env.API_KEY || config.get("privateApiKey") || config.get("apiKey") || "";
+const powDifficulty = process.env.POW_DIFFICULTY || config.get("powDifficulty") || "4";
+const webClientSalt = process.env.WEB_CLIENT_SALT || config.get("webClientSalt") || "md2pdf_lite_salt_v1";
 
 // =========================================================================
 // 1. ECR Repository & Docker Image Build (Chromium + CJK + md-to-pdf)
@@ -68,6 +78,9 @@ const lambdaFunc = new aws.lambda.Function("md-to-pdf-function", {
     variables: {
       NODE_ENV: "production",
       PUPPETEER_CACHE_DIR: "/tmp/.cache",
+      PRIVATE_API_KEY: privateApiKey,
+      POW_DIFFICULTY: powDifficulty,
+      WEB_CLIENT_SALT: webClientSalt,
     },
   },
 });

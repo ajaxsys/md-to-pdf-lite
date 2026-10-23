@@ -9,6 +9,7 @@ yarn-error.log*
 /coverage
 .env
 .env.*
+!.env.example
 .vscode/
 .idea/
 output/

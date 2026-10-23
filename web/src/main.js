@@ -8,6 +8,7 @@ import TableHeader from '@tiptap/extension-table-header';
 import Placeholder from '@tiptap/extension-placeholder';
 
 import { translations, getInitialLanguage, setLanguage } from './i18n.js';
+import { solveProofOfWork } from './pow.js';
 
 // App State
 let currentLang = getInitialLanguage();
@@ -276,11 +277,24 @@ async function handleExportPDF() {
       filename: `document-${Date.now()}.pdf`
     };
 
+    // Solve lightweight Proof of Work challenge (~50-90ms)
+    const salt = import.meta.env.VITE_WEB_CLIENT_SALT || 'md2pdf_lite_salt_v1';
+    const difficulty = Number(import.meta.env.VITE_POW_DIFFICULTY) || 4;
+    const pow = solveProofOfWork({ path: '/api/convert', salt, difficulty });
+
+    const requestHeaders = {
+      'Content-Type': 'application/json',
+      'x-pow-timestamp': String(pow.timestamp),
+      'x-pow-nonce': String(pow.nonce)
+    };
+
+    if (import.meta.env.VITE_API_KEY) {
+      requestHeaders['x-api-key'] = import.meta.env.VITE_API_KEY;
+    }
+
     const response = await fetch('/api/convert', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: requestHeaders,
       body: JSON.stringify(payload)
     });
 

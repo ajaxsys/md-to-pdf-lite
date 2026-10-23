@@ -1,5 +1,6 @@
 'use strict';
 
+const crypto = require('crypto');
 const { convert } = require('./converter');
 
 let sparticuzChromium = null;
@@ -34,7 +35,7 @@ exports.handler = async (event, context) => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key, x-pow-timestamp, x-pow-nonce',
         'Access-Control-Max-Age': '86400'
       },
       body: ''
@@ -50,6 +51,67 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({ error: 'Method Not Allowed. Use POST to convert Markdown.' })
+    };
+  }
+
+  // 4. Dual-Channel Authentication & Anti-Bot Protection:
+  //    Channel A: Private API Key (For local curl, backend scripts, CI/CD - immediate bypass)
+  //    Channel B: Proof of Work (PoW) verification (For Web Studio - zero external dependencies, 0.02ms verify)
+  const PRIVATE_API_KEY = (process.env.PRIVATE_API_KEY || process.env.API_KEY || '').trim();
+  const POW_DIFFICULTY = parseInt(process.env.POW_DIFFICULTY || '4', 10);
+  const WEB_CLIENT_SALT = process.env.WEB_CLIENT_SALT || 'md2pdf_lite_salt_v1';
+
+  const headers = event.headers || {};
+  const query = event.queryStringParameters || {};
+
+  const clientKey =
+    headers['x-api-key'] ||
+    headers['X-Api-Key'] ||
+    (headers['authorization'] || headers['Authorization'] || '').replace(/^Bearer\s+/i, '').trim() ||
+    query.api_key ||
+    query.key;
+
+  let authorized = false;
+
+  // Channel A: Check Private API Key
+  if (PRIVATE_API_KEY && clientKey === PRIVATE_API_KEY) {
+    authorized = true;
+  }
+
+  // Channel B: Check Proof of Work (if not authorized via Private Key)
+  if (!authorized) {
+    const powTimestampStr = headers['x-pow-timestamp'] || headers['X-Pow-Timestamp'];
+    const powNonceStr = headers['x-pow-nonce'] || headers['X-Pow-Nonce'];
+
+    if (powTimestampStr && powNonceStr !== undefined) {
+      const powTimestamp = parseInt(powTimestampStr, 10);
+      const now = Date.now();
+      // Allow +/- 120s window to handle clock drift and client compute time
+      if (!isNaN(powTimestamp) && Math.abs(now - powTimestamp) <= 120000) {
+        const challenge = `/api/convert:${powTimestamp}:${WEB_CLIENT_SALT}`;
+        const hash = crypto.createHash('sha256').update(`${challenge}:${powNonceStr}`).digest('hex');
+        const expectedPrefix = '0'.repeat(POW_DIFFICULTY);
+        if (hash.startsWith(expectedPrefix)) {
+          authorized = true;
+        }
+      }
+    }
+  }
+
+  // If neither Private Key nor valid PoW is present, reject request
+  if (!authorized) {
+    return {
+      statusCode: 401,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key, x-pow-timestamp, x-pow-nonce'
+      },
+      body: JSON.stringify({
+        error: 'Unauthorized',
+        message: 'Access denied. Valid "x-api-key" or Proof-of-Work (x-pow-timestamp, x-pow-nonce) required.'
+      })
     };
   }
 
@@ -145,7 +207,7 @@ exports.handler = async (event, context) => {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key, x-pow-timestamp, x-pow-nonce'
       },
       body: Buffer.from(buffer).toString('base64')
     };
