@@ -41,7 +41,9 @@
   },
   "scripts": {
     "start": "node bin/cli.js",
-    "test": "node test/run-tests.js"
+    "test": "node test/run-tests.js",
+    "test:e2e": "node test/run-e2e.js",
+    "test:all": "node test/run-tests.js && node test/run-e2e.js"
   },
   "dependencies": {
     "@vscode/markdown-it-katex": "^1.1.2",
@@ -52,5 +54,8 @@
     "markdown-it-task-lists": "^2.1.1",
     "picocolors": "^1.1.1",
     "puppeteer-core": "^24.4.0"
+  },
+  "devDependencies": {
+    "pdf-parse": "^2.4.5"
   }
 }

@@ -19,6 +19,7 @@ program
   .option('-s, --stylesheet <path>', 'Path to custom CSS stylesheet')
   .option('-c, --css <styles>', 'Custom inline CSS rules')
   .option('-l, --landscape', 'Use landscape orientation', false)
+  .option('--title <title>', 'Custom PDF document title')
   .option('--chrome <path>', 'Path to Chrome/Chromium executable')
   .option('--tagged', 'Generate tagged accessible PDF (increases file size)', false)
   .option('--check-env', 'Check environment and detected Chrome path')
@@ -95,6 +96,7 @@ program
           landscape: options.landscape,
           css: options.css,
           stylesheet: options.stylesheet,
+          title: options.title,
           executablePath: chromePath,
           tagged: options.tagged
         });

@@ -215,7 +215,8 @@ async function convert(params = {}) {
       await page.pdf(pdfOptions);
       return { pdfPath: resolvedOutput };
     } else {
-      const buffer = await page.pdf(pdfOptions);
+      const rawPdf = await page.pdf(pdfOptions);
+      const buffer = Buffer.isBuffer(rawPdf) ? rawPdf : Buffer.from(rawPdf);
       return { buffer };
     }
   } finally {
