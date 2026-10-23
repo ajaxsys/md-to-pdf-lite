@@ -206,6 +206,32 @@ function setupToolbar() {
   bind('tool-quote', () => editor.chain().toggleBlockquote().run());
   bind('tool-code', () => editor.chain().toggleCodeBlock().run());
   bind('tool-table', () => editor.chain().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run());
+  bind('tool-hr', () => editor.chain().setHorizontalRule().run());
+
+  // Update active state of toolbar buttons based on selection
+  const updateActiveStates = () => {
+    if (!editor || currentMode === 'raw') return;
+    const check = (id, fn) => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (fn()) el.classList.add('is-active');
+        else el.classList.remove('is-active');
+      }
+    };
+    check('tool-bold', () => editor.isActive('bold'));
+    check('tool-italic', () => editor.isActive('italic'));
+    check('tool-strike', () => editor.isActive('strike'));
+    check('tool-h1', () => editor.isActive('heading', { level: 1 }));
+    check('tool-h2', () => editor.isActive('heading', { level: 2 }));
+    check('tool-h3', () => editor.isActive('heading', { level: 3 }));
+    check('tool-bullet', () => editor.isActive('bulletList'));
+    check('tool-ordered', () => editor.isActive('orderedList'));
+    check('tool-quote', () => editor.isActive('blockquote'));
+    check('tool-code', () => editor.isActive('codeBlock'));
+  };
+
+  editor.on('transaction', updateActiveStates);
+  editor.on('selectionUpdate', updateActiveStates);
 
   btnLoadSample.addEventListener('click', () => {
     const t = translations[currentLang];
@@ -300,10 +326,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Orientation Toggle
+  const orientationIcon = document.getElementById('orientation-icon');
   orientationToggle.addEventListener('click', () => {
     isLandscape = !isLandscape;
     const t = translations[currentLang];
     orientationText.textContent = isLandscape ? t.landscape : t.portrait;
+    if (orientationIcon) {
+      if (isLandscape) orientationIcon.classList.add('is-landscape');
+      else orientationIcon.classList.remove('is-landscape');
+    }
   });
 
   // Export PDF Button
