@@ -3,11 +3,19 @@
 const crypto = require('crypto');
 const { convert } = require('./converter');
 
-let sparticuzChromium = null;
-try {
-  sparticuzChromium = require('@sparticuz/chromium');
-} catch {
-  // Local environment or container with system chromium
+let sparticuzChromiumPromise = null;
+async function getSparticuzChromium() {
+  if (sparticuzChromiumPromise) return sparticuzChromiumPromise;
+  sparticuzChromiumPromise = (async () => {
+    try {
+      const mod = await import('@sparticuz/chromium');
+      return (mod && mod.default) ? mod.default : mod;
+    } catch (err) {
+      console.warn('[Lambda Init] Failed to load @sparticuz/chromium:', err.message);
+      return null;
+    }
+  })();
+  return sparticuzChromiumPromise;
 }
 
 /**
@@ -181,10 +189,22 @@ exports.handler = async (event, context) => {
     let executablePath = process.env.CHROME_PATH || process.env.PUPPETEER_EXECUTABLE_PATH;
     let puppeteerArgs = undefined;
 
+    const sparticuzChromium = await getSparticuzChromium();
     if (!executablePath && sparticuzChromium) {
-      executablePath = await sparticuzChromium.executablePath();
+      if (typeof sparticuzChromium.executablePath === 'function') {
+        executablePath = await sparticuzChromium.executablePath();
+      }
       puppeteerArgs = sparticuzChromium.args;
     }
+
+    if (!executablePath) {
+      const fs = require('fs');
+      if (fs.existsSync('/tmp/chromium')) {
+        executablePath = '/tmp/chromium';
+      }
+    }
+
+    console.log('[Lambda Handler] Final executablePath:', executablePath, 'sparticuzChromium present:', !!sparticuzChromium);
 
     const { buffer } = await convert({
       markdown,
