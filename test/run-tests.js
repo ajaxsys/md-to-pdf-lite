@@ -50,6 +50,12 @@ Page 2 content.
   assert.ok(preprocessed.includes('```\n<!-- pagebreak -->\n```'), 'Fenced code block pagebreak must remain intact');
   assert.ok(preprocessed.includes('<div class="page-break"></div>\n\nReal break'), 'Standalone pagebreak must be converted');
 
+  // Verify dark code theme flag parsing (:dark and dark)
+  const darkMd = '```typescript:dark\nconst a = 1;\n```\n\n```python dark\nb = 2\n```';
+  const darkHtml = parseMarkdown(darkMd);
+  assert.ok(darkHtml.includes('class="hljs code-theme-dark"'), 'Should support :dark suffix');
+  assert.ok(darkHtml.includes('data-theme="dark"'), 'Should add data-theme="dark" attribute');
+
   console.log('  ✔ Parser correctly handles tables, code, KaTeX, Mermaid, page breaks, and code block immunity');
 
   const { verifyPdf } = require('./pdf-verifier');

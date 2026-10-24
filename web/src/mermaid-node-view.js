@@ -144,16 +144,51 @@ export class StandardCodeBlockNodeView {
 
     this.dom = document.createElement('pre');
     this.dom.setAttribute('spellcheck', 'false');
-    if (node.attrs.language) {
-      this.dom.setAttribute('data-language', node.attrs.language);
-    }
 
     this.contentDOM = document.createElement('code');
     this.contentDOM.setAttribute('spellcheck', 'false');
-    if (node.attrs.language) {
-      this.contentDOM.className = `language-${node.attrs.language}`;
-    }
+
+    this.updateLanguageAndTheme(node.attrs.language);
     this.dom.appendChild(this.contentDOM);
+  }
+
+  updateLanguageAndTheme(rawLang) {
+    if (!rawLang) {
+      this.dom.removeAttribute('data-language');
+      this.dom.classList.remove('code-theme-dark');
+      this.dom.removeAttribute('data-theme');
+      this.contentDOM.className = '';
+      return;
+    }
+
+    let isDark = false;
+    let cleanLang = rawLang.trim();
+    if (cleanLang.includes(':dark')) {
+      isDark = true;
+      cleanLang = cleanLang.replace(/:dark\b/g, '');
+    } else if (cleanLang.endsWith('-dark')) {
+      isDark = true;
+      cleanLang = cleanLang.slice(0, -5);
+    } else if (/\bdark\b/i.test(cleanLang)) {
+      isDark = true;
+      cleanLang = cleanLang.replace(/\bdark\b/gi, '').trim();
+    }
+
+    if (isDark) {
+      this.dom.classList.add('code-theme-dark');
+      this.dom.setAttribute('data-theme', 'dark');
+    } else {
+      this.dom.classList.remove('code-theme-dark');
+      this.dom.removeAttribute('data-theme');
+    }
+
+    if (cleanLang) {
+      this.dom.setAttribute('data-language', cleanLang);
+      this.contentDOM.className = `language-${cleanLang}`;
+    } else {
+      this.dom.removeAttribute('data-language');
+      this.contentDOM.className = '';
+    }
   }
 
   update(updatedNode) {
@@ -161,13 +196,7 @@ export class StandardCodeBlockNodeView {
     if (updatedNode.attrs.language === 'mermaid') return false; // Switch to mermaid
 
     this.node = updatedNode;
-    if (updatedNode.attrs.language) {
-      this.dom.setAttribute('data-language', updatedNode.attrs.language);
-      this.contentDOM.className = `language-${updatedNode.attrs.language}`;
-    } else {
-      this.dom.removeAttribute('data-language');
-      this.contentDOM.className = '';
-    }
+    this.updateLanguageAndTheme(updatedNode.attrs.language);
     return true;
   }
 }

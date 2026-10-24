@@ -59,20 +59,39 @@ function createParser() {
     html: true,
     linkify: true,
     typographer: true,
-    highlight: function (str, lang) {
-      if (lang === 'mermaid') {
+    highlight: function (str, lang, attrs) {
+      let isDark = false;
+      let cleanLang = (lang || '').trim();
+      const rawAttrs = (attrs || '').trim();
+
+      if (cleanLang.includes(':dark')) {
+        isDark = true;
+        cleanLang = cleanLang.replace(/:dark\b/g, '');
+      } else if (cleanLang.endsWith('-dark')) {
+        isDark = true;
+        cleanLang = cleanLang.slice(0, -5);
+      }
+      if (/\bdark\b/i.test(rawAttrs) || /\{.*dark.*\}/i.test(rawAttrs)) {
+        isDark = true;
+      }
+
+      if (cleanLang === 'mermaid') {
         return `<pre class="mermaid">${md.utils.escapeHtml(str)}</pre>`;
       }
-      if (lang && hljs.getLanguage(lang)) {
+
+      const darkClass = isDark ? ' code-theme-dark' : '';
+      const darkAttr = isDark ? ' data-theme="dark"' : '';
+
+      if (cleanLang && hljs.getLanguage(cleanLang)) {
         try {
-          return `<pre class="hljs"><code class="hljs language-${lang}">${
-            hljs.highlight(str, { language: lang, ignoreIllegals: true }).value
+          return `<pre class="hljs${darkClass}"${darkAttr} data-language="${cleanLang}"><code class="hljs language-${cleanLang}">${
+            hljs.highlight(str, { language: cleanLang, ignoreIllegals: true }).value
           }</code></pre>`;
         } catch {
           // fallback
         }
       }
-      return `<pre class="hljs"><code class="hljs">${md.utils.escapeHtml(str)}</code></pre>`;
+      return `<pre class="hljs${darkClass}"${darkAttr}><code class="hljs">${md.utils.escapeHtml(str)}</code></pre>`;
     }
   });
 

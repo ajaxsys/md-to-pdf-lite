@@ -681,17 +681,17 @@ body {
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
-/* Base CodeBlock: Default to Dark Theme (1:1 with clean.css & corporate-ja.css PDF) */
+/* Base CodeBlock: Default to Light/Off-White Card (Harmonious with A4 white canvas) */
 .ProseMirror pre {
   position: relative;
-  background-color: #0f172a !important;
-  color: #e2e8f0 !important;
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
   font-family: var(--font-mono);
   padding: 24px 18px 16px;
   border-radius: 8px;
   margin: 1.4em 0;
   overflow-x: auto;
-  border: 1px solid #1e293b;
+  border: 1px solid #e2e8f0 !important;
   line-height: 1.6;
   font-size: 13px;
 }
@@ -703,9 +703,9 @@ body {
   right: 12px;
   font-size: 0.7rem;
   font-family: var(--font-sans);
-  color: #94a3b8;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 2px 6px;
+  color: #64748b;
+  background: #e2e8f0;
+  padding: 2px 7px;
   border-radius: 4px;
   text-transform: uppercase;
   font-weight: 600;
@@ -725,50 +725,64 @@ body {
 
 .ProseMirror pre code {
   background: transparent !important;
-  color: #e2e8f0 !important;
+  color: #1e293b !important;
   padding: 0;
 }
 
-/* Syntax Highlighting (Dark theme 1:1 with clean.css & corporate-ja.css PDF) */
+/* Light Syntax Highlighting (Default across all themes) */
 .ProseMirror pre .hljs-comment,
-.ProseMirror pre .hljs-quote { color: #94a3b8; font-style: italic; }
+.ProseMirror pre .hljs-quote { color: #6e7781; font-style: italic; }
 .ProseMirror pre .hljs-keyword,
 .ProseMirror pre .hljs-selector-tag,
-.ProseMirror pre .hljs-subst { color: #38bdf8; font-weight: 600; }
+.ProseMirror pre .hljs-subst { color: #cf222e; font-weight: 600; }
 .ProseMirror pre .hljs-string,
 .ProseMirror pre .hljs-attribute,
 .ProseMirror pre .hljs-literal,
 .ProseMirror pre .hljs-template-tag,
 .ProseMirror pre .hljs-template-variable,
 .ProseMirror pre .hljs-type,
-.ProseMirror pre .hljs-addition { color: #4ade80; }
+.ProseMirror pre .hljs-addition { color: #0a3069; }
 .ProseMirror pre .hljs-variable,
-.ProseMirror pre .hljs-deletion { color: #f472b6; }
-.ProseMirror pre .hljs-number { color: #38bdf8; }
+.ProseMirror pre .hljs-deletion { color: #8250df; }
+.ProseMirror pre .hljs-number { color: #0550ae; }
 .ProseMirror pre .hljs-built_in,
-.ProseMirror pre .hljs-name { color: #facc15; }
+.ProseMirror pre .hljs-name { color: #953800; }
 .ProseMirror pre .hljs-title,
-.ProseMirror pre .hljs-section { color: #facc15; font-weight: 600; }
-.ProseMirror pre .hljs-params { color: #cbd5e1; }
-.ProseMirror pre .hljs-punctuation { color: #94a3b8; }
+.ProseMirror pre .hljs-section { color: #116329; font-weight: 600; }
+.ProseMirror pre .hljs-params { color: #24292f; }
+.ProseMirror pre .hljs-punctuation { color: #57606a; }
 
-/* GitHub Light Theme CodeBlock Override (when theme-github is active) */
-.theme-github .ProseMirror pre {
-  background-color: #f6f8fa !important;
-  color: #1f2328 !important;
-  border: 1px solid #d0d7de;
+/* Explicit Dark Theme: ```typescript:dark or ```typescript dark or pre.code-theme-dark */
+.ProseMirror pre.code-theme-dark,
+.ProseMirror pre[data-theme="dark"] {
+  background-color: #0f172a !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #1e293b !important;
 }
-.theme-github .ProseMirror pre[data-language]::before {
-  color: #6e7781;
-  background: transparent;
+
+.ProseMirror pre.code-theme-dark[data-language]::before,
+.ProseMirror pre[data-theme="dark"][data-language]::before {
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.08);
 }
-.theme-github .ProseMirror pre code {
-  color: #1f2328 !important;
+
+.ProseMirror pre.code-theme-dark code,
+.ProseMirror pre[data-theme="dark"] code {
+  color: #e2e8f0 !important;
 }
-.theme-github .ProseMirror pre .hljs-comment { color: #6e7781; }
-.theme-github .ProseMirror pre .hljs-keyword { color: #cf222e; }
-.theme-github .ProseMirror pre .hljs-string { color: #0a3069; }
-.theme-github .ProseMirror pre .hljs-title { color: #116329; }
+
+.ProseMirror pre.code-theme-dark .hljs-comment,
+.ProseMirror pre[data-theme="dark"] .hljs-comment { color: #94a3b8; }
+.ProseMirror pre.code-theme-dark .hljs-keyword,
+.ProseMirror pre[data-theme="dark"] .hljs-keyword { color: #38bdf8; font-weight: 600; }
+.ProseMirror pre.code-theme-dark .hljs-string,
+.ProseMirror pre[data-theme="dark"] .hljs-string { color: #4ade80; }
+.ProseMirror pre.code-theme-dark .hljs-title,
+.ProseMirror pre[data-theme="dark"] .hljs-title { color: #facc15; font-weight: 600; }
+.ProseMirror pre.code-theme-dark .hljs-number,
+.ProseMirror pre[data-theme="dark"] .hljs-number { color: #fb923c; }
+.ProseMirror pre.code-theme-dark .hljs-variable,
+.ProseMirror pre[data-theme="dark"] .hljs-variable { color: #f472b6; }
 
 /* KaTeX Mathematical Formulas Live Preview (1:1 with PDF) */
 .katex-source-hidden {
