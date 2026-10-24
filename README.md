@@ -193,6 +193,23 @@ $$
 $$
 ```
 
+### Code Blocks & Explicit Dark Mode (`:dark`)
+Code blocks default to a clean, ink-friendly light theme (`#f8fafc`) across all themes for professional A4 printing.
+To explicitly render a modern Slate-900 dark theme card with vibrant syntax highlighting (great for terminal outputs or CLI examples), append `:dark` or `dark` to the language:
+
+````markdown
+<!-- Default: Harmonious light card for white A4 documents -->
+```typescript
+import { convert } from 'md-to-pdf-lite';
+```
+
+<!-- Explicit Dark Theme: Slate-900 dark card with vibrant colors -->
+```typescript:dark
+import { convert } from 'md-to-pdf-lite';
+```
+````
+*(Also supports ` ```bash dark `)*
+
 ---
 
 ## 🤖 CI / CD Integration (GitHub Actions)

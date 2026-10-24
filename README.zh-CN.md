@@ -195,6 +195,23 @@ $$
 $$
 ```
 
+### 代码块与显式暗黑卡片 (`:dark`)
+为了在 A4 白纸与正式商务报告中保持素雅与省墨，所有主题的代码块默认采用精致浅灰白卡片（`#f8fafc`）。
+如果您需要特别强调某段代码或展示终端命令行，可以在代码块语言后追加 `:dark` 或 `dark` 显式启用高级 Slate-900 暗色卡片：
+
+````markdown
+<!-- 默认：融入白纸的素雅浅白卡片 -->
+```typescript
+import { convert } from 'md-to-pdf-lite';
+```
+
+<!-- 显式暗黑卡片：酷炫深色背景与霓虹高亮 -->
+```typescript:dark
+import { convert } from 'md-to-pdf-lite';
+```
+````
+*(同时也支持 ` ```bash dark `)*
+
 ---
 
 ## 🤖 CI / CD 流水线集成 (GitHub Actions)

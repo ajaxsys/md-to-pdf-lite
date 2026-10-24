@@ -84,7 +84,7 @@ AI や開発者が特定の構成要素をピンポイントでカスタマイ�
 | **偶数行背景** | `table tbody tr:nth-child(even)` | 長大な表の視認性を高めるため、ごく淡い背景（例：`#f8fafc`）を設定 |
 | **引用ブロック** | `blockquote` | 左端に縦アクセント線 `border-left: 4px solid var(--primary)` を配置 |
 | **インラインコード**| `code` | 等幅フォント。薄い背景色と小さなパディングを設定 |
-| **コードブロック** | `pre`, `pre code`, `.hljs` | 構文ハイライト用コンテナ。角丸、パディング、背景色を調整可能 |
+| **コードブロック** | `pre`, `pre code`, `.hljs`, `pre.code-theme-dark` | 標準は用紙に調和する明色（`#f8fafc`）。`:dark`（例: ` ```ts:dark `）でダークカードに切替 |
 | **KaTeX 数式** | `.katex`, `.katex-display` | 印刷サイズ最適化済。極端な縮小指定は避けることを推奨 |
 | **Mermaid ベクター図**| `.mermaid`, `.mermaid svg` | ダイアグラムのラッパー。標準で中央揃え、`max-width: 100%` を適用 |
 | **強制改ページ** | `.page-break` | Markdown 内の `<!-- pagebreak -->` で出力される空要素 |

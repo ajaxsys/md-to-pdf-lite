@@ -81,7 +81,7 @@ md2pdf-lite document.md --theme github -o manual.pdf
 | **交替行底色** | `table tbody tr:nth-child(even)` | 可指定微弱底色（如 `#f8fafc`）增强长数据表的可读性 |
 | **引用区块** | `blockquote` | 常用设计：左侧加色条 `border-left: 4px solid var(--primary)` |
 | **行内代码** | `code` | 行内等宽标签，背景通常设为 `rgba(...)` 或轻灰色 |
-| **代码高亮块** | `pre`, `pre code`, `.hljs` | 语法高亮外层容器，可定制内边距、圆角与背景颜色 |
+| **代码高亮块** | `pre`, `pre code`, `.hljs`, `pre.code-theme-dark` | 默认统一为素雅浅白（`#f8fafc`）；使用 `:dark` 后缀（如 ` ```ts:dark `）启用暗黑卡片 |
 | **KaTeX 数学公式** | `.katex`, `.katex-display` | 公式容器，已针对打印缩放优化，不建议强行缩小字号 |
 | **Mermaid 矢量图** | `.mermaid`, `.mermaid svg` | 架构流程图容器，默认居中对齐，支持 `svg { max-width: 100%; }` |
 | **强制换页符** | `.page-break` | 在 Markdown 中写 `<!-- pagebreak -->` 转换出的空标签，用于硬分页 |
