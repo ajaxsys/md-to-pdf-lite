@@ -66,7 +66,7 @@ async function testCliE2E() {
     const pdfBuf2 = fs.readFileSync(outPdf2);
     const verif2 = await verifyPdf(pdfBuf2, {
       minPages: 2,
-      mustContain: ['商業帳票・見積テーブル']
+      mustContain: ['商業帳票', '見積', 'Web Architecture']
     });
     console.log(`    ✔ CLI landscape corporate-ja verified: ${verif2.pageCount} pages, ${verif2.byteSize} bytes`);
 

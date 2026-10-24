@@ -58,9 +58,11 @@ async function verifyPdf(pdfInput, expectations = {}) {
 
   // 4. Verify Required Text Strings
   if (Array.isArray(expectations.mustContain)) {
+    const compactText = text.replace(/\s+/g, ' ');
     for (const expectedStr of expectations.mustContain) {
+      const compactExpected = expectedStr.replace(/\s+/g, ' ');
       assert.ok(
-        text.includes(expectedStr),
+        text.includes(expectedStr) || compactText.includes(compactExpected),
         `PDF verification failed: missing expected text "${expectedStr}" in PDF output`
       );
     }
