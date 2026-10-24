@@ -472,13 +472,8 @@ function applyLocalization(lang) {
   setLanguage(lang);
   const t = translations[lang];
 
-  document.title = `${t.appTitle} | Serverless CJK PDF`;
-  const desktopTitle = appTitle.querySelector('.brand-title-desktop');
-  if (desktopTitle) {
-    desktopTitle.textContent = t.appTitle;
-  } else {
-    appTitle.textContent = t.appTitle;
-  }
+  document.title = `MD2PDF | Serverless CJK PDF`;
+  appTitle.textContent = 'MD2PDF';
   appBadge.textContent = t.appBadge;
   themeLabel.textContent = t.themeLabel;
   formatLabel.textContent = t.formatLabel;

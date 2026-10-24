@@ -9,7 +9,7 @@ import sampleJa from '@examples/sample.ja.md?raw';
 
 export const translations = {
   en: {
-    appTitle: 'md-to-pdf studio',
+    appTitle: 'MD2PDF',
     appBadge: 'Serverless Lite',
     tagline: 'Professional typography with native CJK support & instant export',
     visualMode: 'Visual (WYSIWYG)',
@@ -35,7 +35,7 @@ export const translations = {
     sampleDoc: sampleEn
   },
   'zh-CN': {
-    appTitle: 'md-to-pdf 工作台',
+    appTitle: 'MD2PDF',
     appBadge: 'Serverless 极速版',
     tagline: '原生中日韩排版优化 · 云端无头渲染 · 一键导出高品质文档',
     visualMode: '所见即所得',
@@ -61,7 +61,7 @@ export const translations = {
     sampleDoc: sampleZh
   },
   ja: {
-    appTitle: 'md-to-pdf スタジオ',
+    appTitle: 'MD2PDF',
     appBadge: 'サーバーレス軽量版',
     tagline: '日本語・CJK組版に最適化された商用グレードPDF作成エディタ',
     visualMode: 'ビジュアル編集',

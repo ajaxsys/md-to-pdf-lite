@@ -481,7 +481,7 @@ async function testWebStudioE2E() {
       const pagebreakTitle = pagebreakBtn?.title || '';
 
       // 2. Mobile SP header shows MD2PDF and clean settings trigger
-      const brandMobile = document.querySelector('.brand-title-mobile');
+      const brandMobile = document.querySelector('.brand-title-mobile') || document.getElementById('app-title');
       const brandMobileStyle = brandMobile ? window.getComputedStyle(brandMobile).display : 'none';
       const spSettingsBtn = document.getElementById('btn-sp-settings');
       const spSettingsComputed = spSettingsBtn ? window.getComputedStyle(spSettingsBtn).display : 'none';

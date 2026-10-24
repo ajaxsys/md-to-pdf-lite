@@ -132,12 +132,17 @@ function uploadDirToS3(dirPath: string, baseDir: string) {
     } else {
       const relativePath = path.relative(baseDir, fullPath);
       const mimeType = mime.lookup(fullPath) || "application/octet-stream";
+      const isHtml = relativePath.endsWith(".html");
+      const cacheControl = isHtml
+        ? "max-age=0, no-cache, no-store, must-revalidate"
+        : "public, max-age=31536000, immutable";
 
       new aws.s3.BucketObjectv2(`web-asset-${relativePath.replace(/[/\\.]/g, "-")}`, {
         bucket: webBucket.id,
         key: relativePath,
         source: new pulumi.asset.FileAsset(fullPath),
         contentType: mimeType,
+        cacheControl: cacheControl,
       });
     }
   }
@@ -277,3 +282,4 @@ export const cloudFrontUrl = pulumi.interpolate`https://${distribution.domainNam
 export const cloudFrontDomain = distribution.domainName;
 export const directLambdaFunctionUrl = functionUrl.functionUrl;
 export const ecrRepositoryUrl = ecrRepo.repositoryUrl;
+export const webUiBucketName = webBucket.id;

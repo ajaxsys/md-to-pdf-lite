@@ -160,18 +160,11 @@ body {
 }
 
 .brand-title {
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--fg-default);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   white-space: nowrap;
-}
-
-.brand-title-desktop {
-  display: inline;
-}
-.brand-title-mobile {
-  display: none;
 }
 
 .brand-doc-name {
@@ -1459,8 +1452,6 @@ body {
    ========================================================================== */
 
 @media (max-width: 768px) {
-  .brand-title-desktop { display: none !important; }
-  .brand-title-mobile { display: inline-block !important; font-weight: 700; font-size: 14px; letter-spacing: -0.02em; color: var(--fg-default); }
   .desktop-page-setup { display: none !important; }
   .sp-settings-trigger-wrap { display: inline-flex !important; }
   .btn-sp-settings { display: inline-flex !important; }
