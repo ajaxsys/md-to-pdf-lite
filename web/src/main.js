@@ -12,6 +12,8 @@ import { lowlight } from 'lowlight';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 
 import { MermaidNodeView, StandardCodeBlockNodeView } from './mermaid-node-view.js';
+import { PageBreak } from './page-break-extension.js';
+import { calculateExactPagination, renderPageGuides } from './pagination-engine.js';
 import { translations, getInitialLanguage, setLanguage } from './i18n.js';
 import { solveProofOfWork } from './pow.js';
 
@@ -26,8 +28,6 @@ const CustomCodeBlock = CodeBlockLowlight.extend({
   }
 });
 
-
-
 // App State
 let currentLang = getInitialLanguage();
 let currentMode = 'visual'; // 'visual' | 'raw'
@@ -35,8 +35,11 @@ let isLandscape = false;
 let editor = null;
 let hasUserEdited = false;
 let isProgrammatic = false;
+let lastPaginationResult = { totalPages: 1, breakOffsets: [] };
+let currentPageInView = 1;
 
 // DOM Elements
+const editorWorkspace = document.getElementById('editor-workspace');
 const tiptapContainer = document.getElementById('tiptap-container');
 const rawTextarea = document.getElementById('raw-markdown-editor');
 const langSelect = document.getElementById('lang-select');
@@ -52,6 +55,12 @@ const modeVisual = document.getElementById('mode-visual');
 const modeRaw = document.getElementById('mode-raw');
 const toast = document.getElementById('toast');
 
+// Floating Page Navigator
+const floatingPagePill = document.getElementById('floating-page-pill');
+const pillText = document.getElementById('pill-text');
+const pillPrev = document.getElementById('pill-prev');
+const pillNext = document.getElementById('pill-next');
+
 // Stats Elements
 const statWords = document.getElementById('stat-words');
 const statChars = document.getElementById('stat-chars');
@@ -63,6 +72,30 @@ const appBadge = document.getElementById('app-badge');
 const themeLabel = document.getElementById('theme-label');
 const formatLabel = document.getElementById('format-label');
 const loadSampleText = document.getElementById('load-sample-text');
+
+/**
+ * Apply paper dimensions class to sync canvas with selected format & orientation
+ */
+function updatePaperCanvasGeometry() {
+  const format = formatSelect.value || 'A4';
+  const formats = ['format-A4', 'format-Letter', 'format-A3', 'format-Legal'];
+
+  formats.forEach((f) => {
+    tiptapContainer.classList.remove(f);
+    rawTextarea.classList.remove(f);
+  });
+
+  tiptapContainer.classList.add(`format-${format}`);
+  rawTextarea.classList.add(`format-${format}`);
+
+  if (isLandscape) {
+    tiptapContainer.classList.add('is-landscape');
+    rawTextarea.classList.add('is-landscape');
+  } else {
+    tiptapContainer.classList.remove('is-landscape');
+    rawTextarea.classList.remove('is-landscape');
+  }
+}
 
 /**
  * Load markdown content into both visual and raw editors
@@ -102,6 +135,7 @@ function initEditor() {
         tightLists: true,
         bulletListMarker: '-'
       }),
+      PageBreak,
       Table.configure({ resizable: true }),
       TableRow,
       TableHeader,
@@ -127,22 +161,147 @@ function initEditor() {
   // Set initial raw content
   rawTextarea.value = t.sampleDoc;
   hasUserEdited = false;
+  updatePaperCanvasGeometry();
   updateStats();
 }
 
-
 /**
- * Update word, character and page estimates
+ * Update word, character, 1:1 precision page calculation, and divider guides
  */
 function updateStats() {
   const content = getCurrentMarkdown();
   const chars = content.length;
   const words = content.trim() ? content.trim().split(/\s+/).length : 0;
-  const estPages = Math.max(1, Math.ceil(chars / 1800));
 
   statWords.textContent = `${words} words`;
   statChars.textContent = `${chars} chars`;
-  statPages.textContent = `~${estPages} page${estPages > 1 ? 's' : ''}`;
+
+  // Exact 1:1 pagination simulation
+  const format = formatSelect.value || 'A4';
+  const targetSurface = currentMode === 'visual' ? tiptapContainer : null;
+  const pagination = calculateExactPagination(targetSurface, format, isLandscape);
+  lastPaginationResult = pagination;
+
+  const totalPages = pagination.totalPages;
+  statPages.textContent = `${totalPages} page${totalPages > 1 ? 's' : ''} (${format} 1:1)`;
+
+  // Render guides inside canvas
+  if (currentMode === 'visual') {
+    renderPageGuides(tiptapContainer, pagination.breakOffsets, format, isLandscape);
+  }
+
+  // Update floating navigator
+  updateFloatingPill(totalPages, format);
+}
+
+/**
+ * Update floating pill text and visibility
+ */
+function updateFloatingPill(totalPages, format) {
+  if (!pillText) return;
+  const safePage = Math.min(Math.max(1, currentPageInView), totalPages);
+  currentPageInView = safePage;
+  const orient = isLandscape ? (currentLang === 'ja' ? '横' : currentLang === 'zh-CN' ? '横向' : 'Land') : (currentLang === 'ja' ? '縦' : currentLang === 'zh-CN' ? '纵向' : 'Port');
+  pillText.textContent = `${safePage} / ${totalPages} (${format} · ${orient})`;
+}
+
+/**
+ * Setup DOM mutation and drag observers to recalculate pagination dynamically
+ */
+function setupEditorObservers() {
+  if (!tiptapContainer) return;
+
+  let debounceTimer = null;
+  const debouncedRecalc = () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      updateStats();
+    }, 40);
+  };
+
+  // 1. Observe ProseMirror children reordering (e.g., drag and drop nodes)
+  const proseMirror = tiptapContainer.querySelector('.ProseMirror') || tiptapContainer;
+  const observer = new MutationObserver((mutations) => {
+    let shouldRecalc = false;
+    for (const m of mutations) {
+      if (m.type === 'childList') {
+        shouldRecalc = true;
+        break;
+      }
+    }
+    if (shouldRecalc) debouncedRecalc();
+  });
+
+  observer.observe(proseMirror, { childList: true, subtree: false });
+
+  // 2. Drag & Drop events on canvas
+  tiptapContainer.addEventListener('dragend', () => {
+    setTimeout(updateStats, 60);
+  });
+  tiptapContainer.addEventListener('drop', () => {
+    setTimeout(updateStats, 60);
+  });
+
+  // 3. Window resize observer
+  window.addEventListener('resize', debouncedRecalc, { passive: true });
+}
+
+/**
+ * Track current page in view on scroll
+ */
+function setupScrollObserver() {
+  window.addEventListener('scroll', () => {
+    if (currentMode !== 'visual' || !lastPaginationResult.breakOffsets) return;
+
+    const scrollY = window.scrollY || window.pageYOffset;
+    const containerTop = tiptapContainer.getBoundingClientRect().top + scrollY;
+    const currentOffsetInCanvas = Math.max(0, scrollY + 120 - containerTop);
+
+    let activePage = 1;
+    for (let i = 0; i < lastPaginationResult.breakOffsets.length; i++) {
+      if (currentOffsetInCanvas >= lastPaginationResult.breakOffsets[i].topPx) {
+        activePage = i + 2;
+      }
+    }
+
+    if (activePage !== currentPageInView) {
+      currentPageInView = activePage;
+      const format = formatSelect.value || 'A4';
+      updateFloatingPill(lastPaginationResult.totalPages, format);
+    }
+  }, { passive: true });
+
+  // Floating pill navigation clicks
+  if (pillPrev) {
+    pillPrev.addEventListener('click', () => {
+      if (currentPageInView <= 1) return;
+      scrollToPage(currentPageInView - 1);
+    });
+  }
+
+  if (pillNext) {
+    pillNext.addEventListener('click', () => {
+      if (currentPageInView >= lastPaginationResult.totalPages) return;
+      scrollToPage(currentPageInView + 1);
+    });
+  }
+}
+
+/**
+ * Smoothly scroll to a specific page boundary
+ */
+function scrollToPage(targetPage) {
+  if (targetPage === 1) {
+    window.scrollTo({ top: tiptapContainer.offsetTop - 70, behavior: 'smooth' });
+    return;
+  }
+
+  const breakIdx = targetPage - 2;
+  const breakInfo = lastPaginationResult.breakOffsets[breakIdx];
+  if (breakInfo) {
+    const targetScrollY = tiptapContainer.offsetTop + breakInfo.topPx - 30;
+    window.scrollTo({ top: targetScrollY, behavior: 'smooth' });
+  }
 }
 
 /**
@@ -226,6 +385,8 @@ function applyLocalization(lang) {
 
   orientationText.textContent = isLandscape ? t.landscape : t.portrait;
   langSelect.value = lang;
+
+  updateStats();
 }
 
 /**
@@ -258,6 +419,7 @@ function setupToolbar() {
   bind('tool-code', () => editor.chain().toggleCodeBlock().run());
   bind('tool-table', () => editor.chain().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run());
   bind('tool-hr', () => editor.chain().setHorizontalRule().run());
+  bind('tool-pagebreak', () => editor.chain().setPageBreak().run());
 
   // Update active state of toolbar buttons based on selection
   const updateActiveStates = () => {
@@ -374,8 +536,6 @@ async function handleExportPDF() {
     document.body.appendChild(a);
     a.click();
 
-    // Critical: Do NOT revoke URL immediately synchronously!
-    // Chrome's download engine needs a brief moment to register the blob URL and filename.
     setTimeout(() => {
       a.remove();
       window.URL.revokeObjectURL(downloadUrl);
@@ -396,6 +556,8 @@ async function handleExportPDF() {
 document.addEventListener('DOMContentLoaded', () => {
   initEditor();
   setupToolbar();
+  setupEditorObservers();
+  setupScrollObserver();
   applyLocalization(currentLang);
 
   // Language Select
@@ -421,11 +583,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Theme Select Handler to synchronize WYSIWYG surface styles with selected PDF theme
+  // Theme Select Handler
   function updateThemeClass(theme) {
     if (!tiptapContainer) return;
     tiptapContainer.classList.remove('theme-clean', 'theme-corporate-ja', 'theme-github');
     tiptapContainer.classList.add(`theme-${theme}`);
+    updateStats();
   }
 
   themeSelect.addEventListener('change', (e) => {
@@ -433,7 +596,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   updateThemeClass(themeSelect.value);
 
-  // Orientation Toggle
+  // Paper Format Select Handler
+  formatSelect.addEventListener('change', () => {
+    updatePaperCanvasGeometry();
+    updateStats();
+  });
+
+  // Orientation Toggle Handler
   const orientationIcon = document.getElementById('orientation-icon');
   orientationToggle.addEventListener('click', () => {
     isLandscape = !isLandscape;
@@ -443,6 +612,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isLandscape) orientationIcon.classList.add('is-landscape');
       else orientationIcon.classList.remove('is-landscape');
     }
+    updatePaperCanvasGeometry();
+    updateStats();
   });
 
   // Export PDF Button

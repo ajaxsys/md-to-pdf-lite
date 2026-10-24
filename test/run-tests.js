@@ -41,8 +41,16 @@ Page 2 content.
   assert.ok(html.includes('class="hljs'), 'Should contain highlighted code');
   assert.ok(html.includes('class="katex"'), 'Should render KaTeX formula');
   assert.ok(html.includes('class="mermaid"'), 'Should render mermaid block');
-  assert.ok(html.includes('class="page-break"'), 'Should convert <!-- pagebreak --> tag');
-  console.log('  ✔ Parser correctly handles tables, code, KaTeX, Mermaid, and page breaks');
+  // Verify preprocessMarkdown code block immunity
+  const { preprocessMarkdown } = require('../src/index');
+  const codeImmunityMd = 'Explain: `<!-- pagebreak -->` and `---pagebreak---`\n\n```\n<!-- pagebreak -->\n```\n\n<!-- pagebreak -->\n\nReal break';
+  const preprocessed = preprocessMarkdown(codeImmunityMd);
+  assert.ok(preprocessed.includes('`<!-- pagebreak -->`'), 'Inline code must remain intact');
+  assert.ok(preprocessed.includes('`---pagebreak---`'), 'Inline pagebreak syntax must remain intact');
+  assert.ok(preprocessed.includes('```\n<!-- pagebreak -->\n```'), 'Fenced code block pagebreak must remain intact');
+  assert.ok(preprocessed.includes('<div class="page-break"></div>\n\nReal break'), 'Standalone pagebreak must be converted');
+
+  console.log('  ✔ Parser correctly handles tables, code, KaTeX, Mermaid, page breaks, and code block immunity');
 
   const { verifyPdf } = require('./pdf-verifier');
 

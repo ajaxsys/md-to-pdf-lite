@@ -26,6 +26,7 @@ Existing Markdown-to-PDF solutions often come with practical trade-offs:
 **`md-to-pdf-lite` solves all of these:**
 - 🔒 **100% Offline & Air-Gapped at Runtime**: After `npm install`, all Markdown rendering, Mermaid vector diagrams, KaTeX math, and local images execute completely inside your local host browser sandbox. **Zero external network requests at runtime**, ensuring total compliance for private enterprise networks and confidential data;
 - ⚡ **Zero-Chromium Bundle (Lightning Fast)**: No 300MB+ browser downloads; lightweight JS dependencies install in seconds. Automatically discovers your host Google Chrome, Microsoft Edge, Brave, or Chromium;
+- 🖱️ **Interactive Drag-and-Drop Pagination & 1:1 Live Recalculation**: Eliminates the biggest pain point of Markdown-to-PDF formatting. Drag page break capsules directly inside the WYSIWYG editor to instantly re-anchor page boundaries. The engine dynamically recalculates remaining canvas capacity at 96 DPI in real time, guaranteeing 100% visual parity with the exported PDF;
 - 🎨 **Beautiful Out-of-the-box CJK Typography**: Commercial proposal & GitHub-style theme optimized for PingFang, Hiragino Sans, Meiryo, and system fonts;
 - 📊 **Offline Mermaid Vector Diagrams**: Flowcharts, sequence diagrams, and architecture graphs render directly to crisp vector SVGs without external network calls;
 - 📄 **Intuitive Page Breaks**: Cleanly split pages using `<!-- pagebreak -->` or `---pagebreak---`;
@@ -136,6 +137,23 @@ async function generateBuffer() {
   // buffer is a Buffer containing the PDF binary
 }
 ```
+
+---
+
+## 🖥️ Web Studio & Interactive Drag-and-Drop Pagination
+
+Tired of blindly compiling PDFs only to find that a table or code snippet is awkwardly sliced across two pages? `md-to-pdf-lite` features an integrated **WYSIWYG Web Studio** (built with TipTap and modern CSS) that solves pagination pain once and for all:
+
+- **🖱️ Drag-and-Drop Page Breaks**: Page breaks are rendered as physical, interactive capsules (`[ 📄 Page Break · Page 1 End ]`). Simply click the toolbar button to insert one, or **drag and drop** existing capsules anywhere in the document to visually adjust where pages split;
+- **📐 1:1 Live Physical Recalculation**: Accurately mirrors Chromium's 96 DPI print layout engine (e.g. A4 content box at 1009.13px net height). When you move a page break, the engine instantly cuts the page at that exact point, resets the baseline, and recalculates available page space for following elements in real-time (`~50ms`);
+- **⚡ Smart Dual-Layer Guides**: Distinguishes between your deliberate manual page breaks and automated overflow dividers (`Page X End (Auto)`), completely avoiding duplicate lines or visual clutter;
+- **📊 In-Editor Mermaid & Math Live Preview**: Interactive Mermaid block cards with one-click source code editing and instant vector SVG rendering;
+- **💻 Local Dev Mode**: Start the studio locally with a single command:
+  ```bash
+  npm run dev
+  # Web Studio starts on http://localhost:3555/
+  ```
+  *(Features an embedded dev middleware connecting directly to your host Chrome to export genuine PDFs on the fly!)*
 
 ---
 

@@ -44,7 +44,7 @@ async function testCliE2E() {
 
     const pdfBuf1 = fs.readFileSync(outPdf1);
     const verif1 = await verifyPdf(pdfBuf1, {
-      exactPages: 4,
+      exactPages: 2,
       mustContain: ['md-to-pdf-lite Showcase Document', 'Markdown Source']
     });
     console.log(`    ✔ CLI conversion verified: ${verif1.pageCount} pages, ${verif1.byteSize} bytes`);

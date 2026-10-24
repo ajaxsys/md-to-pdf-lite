@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer-core');
 const { findChromeExecutable } = require('../src/chrome-finder');
+const { convert } = require('../src/index');
+const { verifyPdf } = require('./pdf-verifier');
 
 const distDir = path.resolve(__dirname, '../web/dist');
 const mimeTypes = {
@@ -218,6 +220,89 @@ async function testWebStudioE2E() {
     assert.ok(powResult.nonce > 0, 'PoW should find a valid nonce');
     assert.ok(powResult.durationMs < 2000, `PoW should compute quickly, took ${powResult.durationMs}ms`);
     console.log(`    ✔ PoW verified in browser: solved in ${powResult.durationMs.toFixed(1)}ms (nonce: ${powResult.nonce})`);
+
+    // Test 9: 1:1 Precision Pagination & In-Canvas Page Guides
+    console.log('  ▶ Test 3.9: Verify 1:1 pagination calculation & in-canvas divider guides');
+    const paginationInfo = await page.evaluate(() => {
+      const statPages = document.getElementById('stat-pages')?.textContent || '';
+      const guides = document.querySelectorAll('.page-guide-marker');
+      const pill = document.getElementById('floating-page-pill');
+      const pillText = document.getElementById('pill-text')?.textContent || '';
+      const surface = document.getElementById('tiptap-container');
+      return {
+        statPages,
+        guideCount: guides.length,
+        hasPill: !!pill,
+        pillText,
+        hasFormatA4: surface.classList.contains('format-A4')
+      };
+    });
+    assert.ok(paginationInfo.statPages.includes('2 pages'), `Expected 2 pages in status, got ${paginationInfo.statPages}`);
+    assert.ok(paginationInfo.statPages.includes('1:1'), 'Status bar must show 1:1 indicator');
+    assert.ok(paginationInfo.guideCount >= 1, `Expected at least 1 page guide divider, got ${paginationInfo.guideCount}`);
+    assert.ok(paginationInfo.hasPill, 'Floating page navigator pill must be present');
+    assert.ok(paginationInfo.pillText.includes('2'), `Pill text should show total 2 pages, got: ${paginationInfo.pillText}`);
+    assert.ok(paginationInfo.hasFormatA4, 'Surface must have format-A4 class bound');
+    console.log(`    ✔ 1:1 precision pagination verified: ${paginationInfo.statPages}, ${paginationInfo.guideCount} guide lines rendered`);
+
+    // Test 10: TipTap Custom PageBreak Node & Toolbar Action
+    console.log('  ▶ Test 3.10: Verify custom TipTap PageBreak node insertion & serialization');
+    const pageBreakInserted = await page.evaluate(() => {
+      const btn = document.getElementById('tool-pagebreak');
+      if (!btn) return { inserted: false, reason: 'no-btn' };
+      btn.click();
+      const nodes = document.querySelectorAll('.page-break-node');
+      const textarea = document.getElementById('raw-markdown-editor');
+      const modeRaw = document.getElementById('mode-raw');
+      const modeVisual = document.getElementById('mode-visual');
+      
+      modeRaw.click();
+      const markdownHasPagebreak = textarea.value.includes('<!-- pagebreak -->');
+      modeVisual.click();
+
+      return {
+        inserted: nodes.length > 0,
+        markdownHasPagebreak,
+        nodeCount: nodes.length
+      };
+    });
+    assert.ok(pageBreakInserted.inserted, 'Toolbar button should insert PageBreak node');
+    assert.ok(pageBreakInserted.markdownHasPagebreak, 'Markdown serialization must preserve <!-- pagebreak -->');
+    console.log('    ✔ TipTap PageBreak node inserted, rendered, and serialized cleanly to markdown');
+
+    // Test 11: Web UI Pages === Core Converter PDF Engine 1:1 Parity
+    console.log('  ▶ Test 3.11: Verify 1:1 exact parity between Web Studio pagination and PDF engine');
+    // Reload sample to restore clean state
+    await page.evaluate(() => {
+      document.getElementById('btn-load-sample').click();
+    });
+    await new Promise(r => setTimeout(r, 300));
+
+    const webData = await page.evaluate(() => {
+      const md = document.getElementById('raw-markdown-editor')?.value;
+      const statPages = document.getElementById('stat-pages')?.textContent;
+      const match = statPages.match(/(\d+)\s+page/);
+      return {
+        markdown: md,
+        webPages: match ? Number(match[1]) : 0
+      };
+    });
+
+    assert.strictEqual(webData.webPages, 2, 'Web Studio must report exactly 2 pages for sample doc');
+
+    // Compile same markdown using the Puppeteer PDF converter engine
+    const pdfResult = await convert({
+      markdown: webData.markdown,
+      theme: 'clean',
+      format: 'A4'
+    });
+    const verifiedPdf = await verifyPdf(pdfResult.buffer);
+    assert.strictEqual(
+      webData.webPages,
+      verifiedPdf.pageCount,
+      `Web calculated pages (${webData.webPages}) must exactly match PDF engine pages (${verifiedPdf.pageCount})`
+    );
+    console.log(`    ✔ 1:1 Parity Confirmed: Web UI calculated ${webData.webPages} pages === PDF engine generated ${verifiedPdf.pageCount} pages`);
 
   } finally {
     if (browser) await browser.close();

@@ -99,9 +99,28 @@ function createParser() {
  * - ---pagebreak--- or ---break--- -> <div class="page-break"></div>
  */
 function preprocessMarkdown(text) {
-  let processed = text.replace(/<!--\s*page[-_]?break\s*-->/gi, '<div class="page-break"></div>');
+  if (!text) return '';
+
+  // Protect code blocks and inline code from accidental page break replacement
+  const codeTokens = [];
+  // Match fenced code blocks (```...``` or ~~~...~~~) and inline code (`...`)
+  const codeRegex = /(```[\s\S]*?```|~~~[\s\S]*?~~~|`+[^`\n]+`+)/g;
+  const masked = text.replace(codeRegex, (match) => {
+    const token = `__MD2PDF_CODE_TOKEN_${codeTokens.length}__`;
+    codeTokens.push(match);
+    return token;
+  });
+
+  // Safely replace standalone pagebreak markers in markdown prose
+  let processed = masked.replace(/<!--\s*page[-_]?break\s*-->/gi, '<div class="page-break"></div>');
   processed = processed.replace(/^---pagebreak---\s*$/gim, '<div class="page-break"></div>');
   processed = processed.replace(/^---break---\s*$/gim, '<div class="page-break"></div>');
+
+  // Restore protected code blocks and inline code spans
+  processed = processed.replace(/__MD2PDF_CODE_TOKEN_(\d+)__/g, (_, idx) => {
+    return codeTokens[Number(idx)];
+  });
+
   return processed;
 }
 

@@ -12,14 +12,14 @@ async function testPdfE2E() {
   const sampleMd = fs.readFileSync(samplePath, 'utf8');
 
   // Test 1: Full Document with Clean Theme
-  console.log('  ▶ Test 1.1: Verify sample document with "clean" theme');
+  console.log('  ▶ Test 1.1: Verify sample document with "clean" theme (exactly 2 pages)');
   const cleanResult = await convert({
     markdown: sampleMd,
     theme: 'clean',
     format: 'A4'
   });
   const cleanVerification = await verifyPdf(cleanResult.buffer, {
-    exactPages: 4,
+    exactPages: 2,
     mustContain: [
       'md-to-pdf-lite Showcase Document',
       'CJK Typography',
@@ -34,14 +34,14 @@ async function testPdfE2E() {
   console.log(`    ✔ Clean theme PDF verified: ${cleanVerification.pageCount} pages, ${cleanVerification.byteSize} bytes`);
 
   // Test 2: Full Document with Corporate JA Theme
-  console.log('  ▶ Test 1.2: Verify Japanese business document with "corporate-ja" theme');
+  console.log('  ▶ Test 1.2: Verify Japanese business document with "corporate-ja" theme (exactly 2 pages)');
   const jaResult = await convert({
     markdown: sampleMd,
     theme: 'corporate-ja',
     format: 'A4'
   });
   const jaVerification = await verifyPdf(jaResult.buffer, {
-    exactPages: 4,
+    exactPages: 2,
     mustContain: [
       '商業帳票・見積テーブル',
       'ヒラギノ角ゴ',
@@ -53,14 +53,14 @@ async function testPdfE2E() {
   console.log(`    ✔ Corporate JA theme PDF verified: ${jaVerification.pageCount} pages, ${jaVerification.byteSize} bytes`);
 
   // Test 3: Full Document with GitHub Theme
-  console.log('  ▶ Test 1.3: Verify document with "github" theme');
+  console.log('  ▶ Test 1.3: Verify document with "github" theme (exactly 2 pages)');
   const githubResult = await convert({
     markdown: sampleMd,
     theme: 'github',
     format: 'A4'
   });
   const githubVerification = await verifyPdf(githubResult.buffer, {
-    exactPages: 4,
+    exactPages: 2,
     mustContain: ['md-to-pdf-lite Showcase Document', 'Syntax Highlighting'],
     expectMermaid: true
   });
@@ -103,6 +103,48 @@ graph LR
     mermaidNodeLabels: ['Web Browser', 'API Gateway', 'Billing Service']
   });
   console.log(`    ✔ Standalone Mermaid PDF verified: nodes cleanly compiled into vector diagram`);
+
+  // Test 6: Multilingual Sample Documents Alignment (2 Pages)
+  console.log('  ▶ Test 1.6: Verify sample.ja.md and sample.zh-CN.md render exactly 2 pages');
+  const jaSampleMd = fs.readFileSync(path.resolve(__dirname, '../examples/sample.ja.md'), 'utf8');
+  const zhSampleMd = fs.readFileSync(path.resolve(__dirname, '../examples/sample.zh-CN.md'), 'utf8');
+
+  const jaPdf = await convert({ markdown: jaSampleMd, theme: 'corporate-ja', format: 'A4' });
+  const jaVer = await verifyPdf(jaPdf.buffer, {
+    exactPages: 2,
+    mustContain: ['2ページ目', 'Page Break']
+  });
+  assert.strictEqual(jaVer.pageCount, 2, 'sample.ja.md must render exactly 2 pages');
+
+  const zhPdf = await convert({ markdown: zhSampleMd, theme: 'clean', format: 'A4' });
+  const zhVer = await verifyPdf(zhPdf.buffer, {
+    exactPages: 2,
+    mustContain: ['Page Break', 'Mermaid']
+  });
+  assert.strictEqual(zhVer.pageCount, 2, 'sample.zh-CN.md must render exactly 2 pages');
+  console.log('    ✔ Multilingual showcase documents render exactly 2 pages');
+
+  // Test 7: Code Block & Inline Code Pagebreak Immunity
+  console.log('  ▶ Test 1.7: Verify inline backticks and fenced code do not trigger false page breaks');
+  const immunityMd = `
+# Single Page Title
+
+Explain syntax with backticks: \`<!-- pagebreak -->\` and \`---pagebreak---\`.
+
+\`\`\`markdown
+<!-- pagebreak -->
+---pagebreak---
+\`\`\`
+
+All should remain on page 1.
+`;
+  const immunityRes = await convert({ markdown: immunityMd, format: 'A4' });
+  const immunityVer = await verifyPdf(immunityRes.buffer, {
+    exactPages: 1,
+    mustContain: ['Single Page Title', '<!-- pagebreak -->', '---pagebreak---']
+  });
+  assert.strictEqual(immunityVer.pageCount, 1, 'Code with pagebreak directives must not split page');
+  console.log('    ✔ False page break immunity verified in code blocks & inline backticks');
 
   console.log('  ✨ All PDF compilation E2E tests passed successfully!\n');
 }

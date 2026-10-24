@@ -41,6 +41,8 @@
   },
   "scripts": {
     "start": "node bin/cli.js",
+    "dev": "npm run dev --prefix web",
+    "build:web": "npm run build --prefix web",
     "test": "node test/run-tests.js",
     "test:e2e": "node test/run-e2e.js",
     "test:all": "node test/run-tests.js && node test/run-e2e.js"

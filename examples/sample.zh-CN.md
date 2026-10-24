@@ -2,26 +2,17 @@
 
 > 超轻量、免下载 Chromium 的 Markdown 转 PDF 引擎，专为开发者工作流、CI/CD 自动化流水线及中日韩 (CJK) 多语言文档量身打造。
 
----
-
-## 1. CJK 字体排版与多语言支持
+## 1. CJK 字体排版与商务报价表格
 
 本项目针对中日韩（CJK）字体、排版与标点间距进行了深度优化：
 
-- **中文 (简体 & 繁体)**: 优雅的苹方（PingFang SC）与微软雅黑，字距清晰，行高舒适。
-- **日本語 (Japanese)**: 针对ヒラギノ角ゴ (Hiragino Sans) 与メイリオ (Meiryo) 进行深度优化的高品质商务文档排版。
-- **English**: 现代化的系统级 UI 字体与清晰易读的等宽代码字体。
+- **优雅排版**: 苹方（PingFang SC）与微软雅黑，字距清晰，行高舒适，配备现代等宽代码字体。
 
-### 1.1 商务报价表格示例
-
-| 项目名称 | 业务类别 | 数量 | 单价 | 金额 |
-| :--- | :---: | :---: | ---: | ---: |
-| **Web 架构咨询与设计** | 技术专家顾问 | 1 项 | ¥350,000 | **¥350,000** |
-| **前端 UI/UX 界面开发** | 响应式交互设计 | 1 项 | ¥280,000 | **¥280,000** |
-| **CI/CD 自动化部署流水线** | GitHub Actions | 1 项 | ¥120,000 | **¥120,000** |
-| **费用总计** | — | — | — | **¥750,000** |
-
----
+| 项目名称 | 业务类别 | 数量 | 金额 |
+| :--- | :---: | :---: | ---: |
+| **Web 架构咨询与设计** | 技术专家顾问 | 1 项 | **¥350,000** |
+| **前端 UI/UX 界面开发** | 响应式交互设计 | 1 项 | **¥280,000** |
+| **费用总计** | — | — | **¥630,000** |
 
 ## 2. 代码高亮与语法着色
 
@@ -29,23 +20,13 @@
 import { convert } from 'md-to-pdf-lite';
 
 async function generateReport() {
-  const result = await convert({
-    input: './proposal.md',
-    output: './dist/proposal.pdf',
-    format: 'A4',
-    margin: { top: '20mm', bottom: '20mm' }
-  });
-  console.log(`PDF 已成功生成: ${result.pdfPath}`);
+  return await convert({ input: './proposal.md', output: './dist/proposal.pdf' });
 }
 ```
 
----
-
 ## 3. 数学公式排版 (KaTeX)
 
-支持行内公式如爱因斯坦质能方程 $E = mc^2$ 或贝叶斯定理 $P(A|B) = \frac{P(B|A)P(A)}{P(B)}$，完全离线高精度渲染，无需依赖任何外部网络。
-
-块级公式示例：
+支持行内公式如爱因斯坦质能方程 $E = mc^2$，以及高精度离线渲染的高斯积分块级公式：
 
 $$
 \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
@@ -60,29 +41,22 @@ $$
 原生集成离线矢量图表生成，完美支持 GitHub 风格的 Mermaid 流程图语法：
 
 ```mermaid
-graph TD
-    A[Markdown 源文件] -->|markdown-it| B(HTML + KaTeX & Highlight.js)
-    B -->|宿主 Chrome / Puppeteer-Core| C{PDF 打印引擎}
-    C -->|免下载 Chromium 运行时| D[高品质商用印刷级 PDF]
+graph LR
+    A[Markdown 源文件] -->|markdown-it| B(HTML + 资源)
+    B -->|宿主 Chrome| C{PDF 打印引擎}
+    C -->|免下载运行时| D[商用高精度 PDF]
     
-    style A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
-    style B fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
-    style C fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
-    style D fill:#ede7f6,stroke:#7b1fa2,stroke-width:2px
+    style A fill:#e1f5fe,stroke:#0288d1,stroke-width:1.5px
+    style B fill:#fff9c4,stroke:#fbc02d,stroke-width:1.5px
+    style C fill:#e8f5e9,stroke:#388e3c,stroke-width:1.5px
+    style D fill:#ede7f6,stroke:#7b1fa2,stroke-width:1.5px
 ```
-
----
 
 ## 5. 原生分页控制 (Page Break)
 
 你可以随时使用以下任意标记在文档中插入干净利落的分页符：
-- `<!-- pagebreak -->`
-- `---pagebreak---`
-- `<div class="page"/>`
-
-所有表格、代码块及图表均默认注入 `page-break-inside: avoid`，彻底告别表格行被跨页硬生生裁断的尴尬体验。
-
----
+- `<!-- pagebreak -->` 或 `---pagebreak---`
+- 所有表格、代码块及图表均默认注入 `page-break-inside: avoid`，防止跨页生硬裁断
 
 ## 6. 特性支持清单
 

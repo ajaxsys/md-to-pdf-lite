@@ -7,7 +7,8 @@
   <meta name="description" content="Commercial-grade Markdown to PDF converter with CJK typography, KaTeX formula support, and serverless acceleration." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <link rel="stylesheet" href="./src/style.css" />
 </head>
 <body>
@@ -128,6 +129,13 @@
         <button id="tool-hr" class="tool-btn" title="Horizontal Divider">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>
         </button>
+        <button id="tool-pagebreak" class="tool-btn" title="Insert Page Break (改ページ)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="2" width="16" height="8" rx="1.5" stroke-dasharray="2 2"/>
+            <rect x="4" y="14" width="16" height="8" rx="1.5"/>
+            <line x1="2" y1="11" x2="22" y2="11" stroke-width="2"/>
+          </svg>
+        </button>
       </div>
 
       <div class="toolbar-spacer"></div>
@@ -146,12 +154,22 @@
     </div>
 
     <!-- Workspace Main Panel -->
-    <main class="editor-workspace">
+    <main class="editor-workspace" id="editor-workspace">
       <!-- Visual TipTap Editor Surface -->
       <div id="tiptap-container" class="editor-surface"></div>
 
       <!-- Raw Markdown Textarea (Synchronized) -->
       <textarea id="raw-markdown-editor" class="raw-markdown-surface" style="display: none;" spellcheck="false" placeholder="Write or paste Markdown here..."></textarea>
+
+      <!-- Floating 1:1 Page Pill Indicator -->
+      <div id="floating-page-pill" class="floating-page-pill" title="Current Page Navigation">
+        <span class="pill-icon">📄</span>
+        <span id="pill-text">Page 1 / 2 (A4)</span>
+        <div class="pill-nav-buttons">
+          <button id="pill-prev" class="pill-arrow-btn" title="Previous Page">▲</button>
+          <button id="pill-next" class="pill-arrow-btn" title="Next Page">▼</button>
+        </div>
+      </div>
     </main>
 
     <!-- Footer Status Bar -->

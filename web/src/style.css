@@ -374,21 +374,34 @@ body {
   padding: 32px 16px 64px;
 }
 
-/* The Paper Card */
+/* The 1:1 True-Paper Canvas */
 .editor-surface,
 .raw-markdown-surface {
-  width: 100%;
-  max-width: 860px;
-  min-height: 1050px;
+  width: 210mm;
+  max-width: 100%;
+  min-height: 297mm;
   height: auto;
   background: var(--bg-card);
   color: var(--text-dark);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 56px 64px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 15mm 12mm;
   outline: none;
-  transition: all 0.2s ease;
+  position: relative;
+  transition: width 0.25s ease, min-height 0.25s ease;
 }
+
+/* Paper Geometry Binding */
+.editor-surface.format-A4, .raw-markdown-surface.format-A4 { width: 210mm; min-height: 297mm; }
+.editor-surface.format-Letter, .raw-markdown-surface.format-Letter { width: 215.9mm; min-height: 279.4mm; }
+.editor-surface.format-A3, .raw-markdown-surface.format-A3 { width: 297mm; min-height: 420mm; }
+.editor-surface.format-Legal, .raw-markdown-surface.format-Legal { width: 215.9mm; min-height: 355.6mm; }
+
+/* Landscape Orientations */
+.editor-surface.is-landscape.format-A4, .raw-markdown-surface.is-landscape.format-A4 { width: 297mm; min-height: 210mm; }
+.editor-surface.is-landscape.format-Letter, .raw-markdown-surface.is-landscape.format-Letter { width: 279.4mm; min-height: 215.9mm; }
+.editor-surface.is-landscape.format-A3, .raw-markdown-surface.is-landscape.format-A3 { width: 420mm; min-height: 297mm; }
+.editor-surface.is-landscape.format-Legal, .raw-markdown-surface.is-landscape.format-Legal { width: 355.6mm; min-height: 215.9mm; }
 
 .raw-markdown-surface {
   font-family: var(--font-mono);
@@ -666,6 +679,22 @@ body {
 }
 
 /* Theme: Corporate JA (Matching corporate-ja.css PDF) */
+/* Theme: Clean Typography Alignment */
+.editor-surface.theme-clean .ProseMirror {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #2d3748;
+}
+
+/* Theme: Corporate JA Typography Alignment */
+.editor-surface.theme-corporate-ja .ProseMirror {
+  font-family: 'Noto Sans JP', 'Hiragino Sans', var(--font-sans);
+  font-size: 14px;
+  line-height: 1.68;
+  letter-spacing: 0.02em;
+  color: #2b354f;
+}
+
 .theme-corporate-ja .ProseMirror h2 {
   font-size: 1.25rem;
   padding: 6px 12px;
@@ -693,6 +722,11 @@ body {
 }
 
 /* Theme: GitHub (Matching github.css PDF) */
+.editor-surface.theme-github .ProseMirror {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 .theme-github .ProseMirror table {
   border-collapse: collapse;
 }
@@ -710,6 +744,155 @@ body {
 
 .theme-github .ProseMirror tbody tr:nth-child(2n) {
   background: #f6f8fa;
+}
+
+/* TipTap Custom Page Break Node */
+.page-break-node {
+  position: relative;
+  margin: 32px 0 24px;
+  border-top: 2px dashed #94a3b8;
+  display: flex;
+  justify-content: center;
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.page-break-node .page-break-pill {
+  position: absolute;
+  top: -12px;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-break-node:hover {
+  border-top-color: #3b82f6;
+}
+
+.page-break-node:hover .page-break-pill {
+  border-color: #3b82f6;
+  color: #2563eb;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.page-break-node.ProseMirror-selectednode {
+  border-top-color: #2563eb;
+}
+
+.page-break-node.ProseMirror-selectednode .page-break-pill {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+}
+
+/* In-Canvas Precision Page Divider Guides */
+.page-guides-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.page-guide-marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.page-guide-marker .page-guide-line {
+  border-top: 1.5px dashed rgba(59, 130, 246, 0.45);
+  width: 100%;
+}
+
+.page-guide-marker .page-guide-badge {
+  position: absolute;
+  right: 16px;
+  top: -11px;
+  background: #0f172a;
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Floating 1:1 Page Pill Indicator */
+.floating-page-pill {
+  position: fixed;
+  bottom: 48px;
+  right: 32px;
+  z-index: 99;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  border-radius: 999px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #f8fafc;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-page-pill:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 10px 36px rgba(59, 130, 246, 0.25);
+}
+
+.pill-icon {
+  font-size: 1rem;
+}
+
+.pill-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  padding-left: 8px;
+}
+
+.pill-arrow-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  transition: all 0.15s;
+}
+
+.pill-arrow-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* Task lists */
