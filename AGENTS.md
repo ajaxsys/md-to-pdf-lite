@@ -9,6 +9,7 @@ Welcome! This file provides essential project architecture, conventions, and wor
 **`md-to-pdf-lite`** is an ultra-lightweight, zero-Chromium-bundle Markdown-to-PDF conversion engine and Serverless Web Studio, featuring deep CJK (Chinese/Japanese/Korean) typography optimization, offline Mermaid vector diagrams, KaTeX math rendering, syntax highlighting, and AWS Serverless deployment.
 
 ### Key Value Propositions
+- **The "Last Mile" for AI Output to Client Delivery**: Solves the critical business gap where LLMs (ChatGPT, Claude, DeepSeek) output Markdown, but clients require polished, printable, commercial-grade PDFs with tables, formulas, and diagrams intact.
 - **Zero Bundled Chromium (CLI/SDK)**: Uses `puppeteer-core` and automatically locates the host machine's installed browser (Chrome, Edge, Brave, or Chromium) via `src/chrome-finder.js`.
 - **100% Offline & Self-Contained Rendering**: Local images are automatically inlined as Base64 Data URLs (`inlineAllLocalImages`), and Mermaid/KaTeX/Highlight.js assets are embedded directly into the generated HTML before rendering.
 - **Commercial CJK Aesthetics**: Three built-in themes (`github`, `clean`, `corporate-ja`) crafted for technical docs, modern minimal quotes (Booktabs), and Japanese enterprise documents (見積書/稟議書/提案書).

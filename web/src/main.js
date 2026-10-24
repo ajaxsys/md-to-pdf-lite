@@ -73,6 +73,29 @@ const themeLabel = document.getElementById('theme-label');
 const formatLabel = document.getElementById('format-label');
 const loadSampleText = document.getElementById('load-sample-text');
 
+// Header & SP Drawer Enhancement Elements
+const docFilenameDisplay = document.getElementById('doc-filename-display');
+const btnSpSettings = document.getElementById('btn-sp-settings');
+const spSummaryBadge = document.getElementById('sp-summary-badge');
+const btnThemeMode = document.getElementById('btn-theme-mode');
+const footerStatusText = document.getElementById('footer-status-text');
+
+const drawerBackdrop = document.getElementById('drawer-backdrop');
+const spBottomSheet = document.getElementById('sp-bottom-sheet');
+const sheetTitle = document.getElementById('sheet-title');
+const sheetClose = document.getElementById('sheet-close');
+const sheetThemeLabel = document.getElementById('sheet-theme-label');
+const sheetThemeSelect = document.getElementById('sheet-theme-select');
+const sheetFormatLabel = document.getElementById('sheet-format-label');
+const sheetFormatSelect = document.getElementById('sheet-format-select');
+const sheetOrientLabel = document.getElementById('sheet-orient-label');
+const sheetOrientPortrait = document.getElementById('sheet-orient-portrait');
+const sheetOrientLandscape = document.getElementById('sheet-orient-landscape');
+const sheetLangLabel = document.getElementById('sheet-lang-label');
+const sheetLangSelect = document.getElementById('sheet-lang-select');
+const sheetSampleLabel = document.getElementById('sheet-sample-label');
+const sheetBtnSample = document.getElementById('sheet-btn-sample');
+
 /**
  * Apply paper dimensions class to sync canvas with selected format & orientation
  */
@@ -166,6 +189,41 @@ function initEditor() {
 }
 
 /**
+ * Update dynamic document filename derived from first H1 heading
+ */
+function updateDocFilenameDisplay(markdown) {
+  if (!docFilenameDisplay) return;
+  const titleMatch = (markdown || '').match(/^#\s+(.+)$/m);
+  const safeTitle = titleMatch ? titleMatch[1].replace(/[\\/:*?"<>|#]/g, '').trim().slice(0, 40) : '';
+  const defaultDoc = currentLang === 'ja' ? '提案書.pdf' : currentLang === 'zh-CN' ? '文档.pdf' : 'document.pdf';
+  docFilenameDisplay.textContent = safeTitle ? `${safeTitle}.pdf` : defaultDoc;
+  docFilenameDisplay.title = safeTitle ? `${safeTitle}.pdf` : defaultDoc;
+}
+
+/**
+ * Sync Drawer controls with main header controls
+ */
+function syncDrawerControls() {
+  if (sheetThemeSelect && themeSelect) sheetThemeSelect.value = themeSelect.value;
+  if (sheetFormatSelect && formatSelect) sheetFormatSelect.value = formatSelect.value;
+  if (sheetLangSelect && langSelect) sheetLangSelect.value = langSelect.value;
+  if (sheetOrientPortrait && sheetOrientLandscape) {
+    if (isLandscape) {
+      sheetOrientPortrait.classList.remove('active');
+      sheetOrientLandscape.classList.add('active');
+    } else {
+      sheetOrientPortrait.classList.add('active');
+      sheetOrientLandscape.classList.remove('active');
+    }
+  }
+  if (spSummaryBadge) {
+    const themeName = themeSelect.value === 'corporate-ja' ? 'Corporate' : themeSelect.value === 'github' ? 'GitHub' : 'Clean';
+    const formatName = formatSelect.value || 'A4';
+    spSummaryBadge.textContent = `${themeName} · ${formatName}`;
+  }
+}
+
+/**
  * Update word, character, 1:1 precision page calculation, and divider guides
  */
 function updateStats() {
@@ -175,6 +233,12 @@ function updateStats() {
 
   statWords.textContent = `${words} words`;
   statChars.textContent = `${chars} chars`;
+
+  // Update header document filename indicator
+  updateDocFilenameDisplay(content);
+
+  // Sync SP Drawer status
+  syncDrawerControls();
 
   // Exact 1:1 pagination simulation
   const format = formatSelect.value || 'A4';
@@ -203,6 +267,15 @@ function updateFloatingPill(totalPages, format) {
   currentPageInView = safePage;
   const orient = isLandscape ? (currentLang === 'ja' ? '横' : currentLang === 'zh-CN' ? '横向' : 'Land') : (currentLang === 'ja' ? '縦' : currentLang === 'zh-CN' ? '纵向' : 'Port');
   pillText.textContent = `${safePage} / ${totalPages} (${format} · ${orient})`;
+
+  if (pillPrev) {
+    pillPrev.disabled = safePage <= 1;
+    pillPrev.classList.toggle('is-disabled', safePage <= 1);
+  }
+  if (pillNext) {
+    pillNext.disabled = safePage >= totalPages;
+    pillNext.classList.toggle('is-disabled', safePage >= totalPages);
+  }
 }
 
 /**
@@ -247,60 +320,88 @@ function setupEditorObservers() {
 }
 
 /**
- * Track current page in view on scroll
+ * Track current page in view on scroll within the .editor-workspace container
  */
 function setupScrollObserver() {
-  window.addEventListener('scroll', () => {
-    if (currentMode !== 'visual' || !lastPaginationResult.breakOffsets) return;
+  const workspace = document.querySelector('.editor-workspace');
 
-    const scrollY = window.scrollY || window.pageYOffset;
-    const containerTop = tiptapContainer.getBoundingClientRect().top + scrollY;
-    const currentOffsetInCanvas = Math.max(0, scrollY + 120 - containerTop);
+  if (workspace) {
+    workspace.addEventListener('scroll', () => {
+      if (currentMode !== 'visual' || !lastPaginationResult || !lastPaginationResult.breakOffsets) return;
 
-    let activePage = 1;
-    for (let i = 0; i < lastPaginationResult.breakOffsets.length; i++) {
-      if (currentOffsetInCanvas >= lastPaginationResult.breakOffsets[i].topPx) {
-        activePage = i + 2;
+      const scrollY = workspace.scrollTop;
+      let activePage = 1;
+      const breaks = lastPaginationResult.breakOffsets;
+
+      for (let i = 0; i < breaks.length; i++) {
+        const b = breaks[i];
+        let breakTop = b.topPx;
+        if (b.element && b.element.isConnected) {
+          const rect = b.element.getBoundingClientRect();
+          const wsRect = workspace.getBoundingClientRect();
+          breakTop = workspace.scrollTop + (rect.top - wsRect.top);
+        }
+        if (scrollY + 120 >= breakTop) {
+          activePage = b.page + 1;
+        }
       }
-    }
 
-    if (activePage !== currentPageInView) {
-      currentPageInView = activePage;
-      const format = formatSelect.value || 'A4';
-      updateFloatingPill(lastPaginationResult.totalPages, format);
-    }
-  }, { passive: true });
+      if (activePage !== currentPageInView) {
+        currentPageInView = activePage;
+        const format = formatSelect.value || 'A4';
+        updateFloatingPill(lastPaginationResult.totalPages, format);
+      }
+    }, { passive: true });
+  }
 
   // Floating pill navigation clicks
   if (pillPrev) {
-    pillPrev.addEventListener('click', () => {
+    pillPrev.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       if (currentPageInView <= 1) return;
       scrollToPage(currentPageInView - 1);
     });
   }
 
   if (pillNext) {
-    pillNext.addEventListener('click', () => {
-      if (currentPageInView >= lastPaginationResult.totalPages) return;
+    pillNext.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const total = lastPaginationResult ? lastPaginationResult.totalPages : 1;
+      if (currentPageInView >= total) return;
       scrollToPage(currentPageInView + 1);
     });
   }
 }
 
 /**
- * Smoothly scroll to a specific page boundary
+ * Smoothly scroll the .editor-workspace to a specific page boundary
  */
 function scrollToPage(targetPage) {
-  if (targetPage === 1) {
-    window.scrollTo({ top: tiptapContainer.offsetTop - 70, behavior: 'smooth' });
+  const workspace = document.querySelector('.editor-workspace');
+  if (!workspace) return;
+
+  const total = lastPaginationResult ? lastPaginationResult.totalPages : 1;
+  const clamped = Math.max(1, Math.min(targetPage, total));
+
+  if (clamped <= 1) {
+    workspace.scrollTo({ top: 0, behavior: 'smooth' });
+    currentPageInView = 1;
+    updateFloatingPill(total, formatSelect.value || 'A4');
     return;
   }
 
-  const breakIdx = targetPage - 2;
-  const breakInfo = lastPaginationResult.breakOffsets[breakIdx];
+  const breaks = lastPaginationResult.breakOffsets || [];
+  const breakInfo = breaks.find(b => b.page === clamped - 1) || breaks[clamped - 2];
   if (breakInfo) {
-    const targetScrollY = tiptapContainer.offsetTop + breakInfo.topPx - 30;
-    window.scrollTo({ top: targetScrollY, behavior: 'smooth' });
+    if (breakInfo.element && breakInfo.element.isConnected) {
+      breakInfo.element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      workspace.scrollTo({ top: Math.max(0, breakInfo.topPx - 20), behavior: 'smooth' });
+    }
+    currentPageInView = clamped;
+    updateFloatingPill(total, formatSelect.value || 'A4');
   }
 }
 
@@ -309,7 +410,10 @@ function scrollToPage(targetPage) {
  */
 function getCurrentMarkdown() {
   if (currentMode === 'visual' && editor) {
-    return editor.storage.markdown.getMarkdown();
+    let md = editor.storage.markdown.getMarkdown();
+    // Normalize tight task lists (prevent tiptap-markdown from inserting loose \n\n between task items)
+    md = md.replace(/(- \[[ xX]\] [^\n]+)\n\n(?=- \[[ xX]\])/g, '$1\n');
+    return md;
   }
   return rawTextarea.value;
 }
@@ -318,8 +422,8 @@ function getCurrentMarkdown() {
  * Sync content between Visual (TipTap) and Raw Textarea
  */
 function syncToRawIfActive() {
-  if (currentMode === 'visual') {
-    rawTextarea.value = editor.storage.markdown.getMarkdown();
+  if (currentMode === 'visual' && editor) {
+    rawTextarea.value = getCurrentMarkdown();
   }
 }
 
@@ -369,7 +473,12 @@ function applyLocalization(lang) {
   const t = translations[lang];
 
   document.title = `${t.appTitle} | Serverless CJK PDF`;
-  appTitle.textContent = t.appTitle;
+  const desktopTitle = appTitle.querySelector('.brand-title-desktop');
+  if (desktopTitle) {
+    desktopTitle.textContent = t.appTitle;
+  } else {
+    appTitle.textContent = t.appTitle;
+  }
   appBadge.textContent = t.appBadge;
   themeLabel.textContent = t.themeLabel;
   formatLabel.textContent = t.formatLabel;
@@ -385,6 +494,40 @@ function applyLocalization(lang) {
 
   orientationText.textContent = isLandscape ? t.landscape : t.portrait;
   langSelect.value = lang;
+
+  // Localize mobile bottom sheet drawer
+  if (sheetTitle) {
+    sheetTitle.textContent = lang === 'ja' ? '用紙・デザイン設定' : lang === 'zh-CN' ? '页面与排版设置' : 'Page & Layout Settings';
+  }
+  if (sheetThemeLabel) sheetThemeLabel.textContent = t.themeLabel;
+  if (sheetFormatLabel) sheetFormatLabel.textContent = t.formatLabel;
+  if (sheetOrientLabel) sheetOrientLabel.textContent = t.orientationLabel || (lang === 'ja' ? '用紙の向き' : lang === 'zh-CN' ? '版面方向' : 'Orientation');
+  if (sheetOrientPortrait) sheetOrientPortrait.textContent = t.portrait;
+  if (sheetOrientLandscape) sheetOrientLandscape.textContent = t.landscape;
+  if (sheetLangLabel) sheetLangLabel.textContent = lang === 'ja' ? '表示言語' : lang === 'zh-CN' ? '界面语言' : 'Language';
+  if (sheetSampleLabel) sheetSampleLabel.textContent = lang === 'ja' ? 'サンプル' : lang === 'zh-CN' ? '示例文档' : 'Sample';
+  if (sheetBtnSample) sheetBtnSample.textContent = t.loadSample;
+
+  if (sheetThemeSelect && sheetThemeSelect.options.length >= 3) {
+    sheetThemeSelect.options[0].textContent = t.themes.clean;
+    sheetThemeSelect.options[1].textContent = t.themes['corporate-ja'];
+    sheetThemeSelect.options[2].textContent = t.themes.github;
+  }
+
+  // Highlight page break tooltip localization
+  const toolPagebreak = document.getElementById('tool-pagebreak');
+  if (toolPagebreak) {
+    toolPagebreak.title = lang === 'ja'
+      ? '改ページ (Ctrl+Enter)'
+      : lang === 'zh-CN'
+        ? '插入分页符 (Ctrl+Enter)'
+        : 'Insert Page Break (Ctrl+Enter)';
+  }
+
+  // Footer status human-readable text
+  if (footerStatusText) {
+    footerStatusText.textContent = lang === 'ja' ? '準備完了' : lang === 'zh-CN' ? '就绪' : 'Ready';
+  }
 
   updateStats();
 }
@@ -618,4 +761,132 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Export PDF Button
   btnExport.addEventListener('click', handleExportPDF);
+
+  // Setup Mobile Bottom Sheet Drawer
+  function toggleBottomSheet(open) {
+    if (!drawerBackdrop || !spBottomSheet) return;
+    if (open) {
+      syncDrawerControls();
+      drawerBackdrop.classList.add('is-open');
+      spBottomSheet.classList.add('is-open');
+    } else {
+      drawerBackdrop.classList.remove('is-open');
+      spBottomSheet.classList.remove('is-open');
+    }
+  }
+
+  if (btnSpSettings) {
+    btnSpSettings.addEventListener('click', () => {
+      toggleBottomSheet(true);
+    });
+  }
+  if (sheetClose) sheetClose.addEventListener('click', () => toggleBottomSheet(false));
+  if (drawerBackdrop) drawerBackdrop.addEventListener('click', () => toggleBottomSheet(false));
+
+  if (sheetThemeSelect) {
+    sheetThemeSelect.addEventListener('change', (e) => {
+      themeSelect.value = e.target.value;
+      themeSelect.dispatchEvent(new Event('change'));
+      syncDrawerControls();
+    });
+  }
+
+  if (sheetFormatSelect) {
+    sheetFormatSelect.addEventListener('change', (e) => {
+      formatSelect.value = e.target.value;
+      formatSelect.dispatchEvent(new Event('change'));
+      syncDrawerControls();
+    });
+  }
+
+  if (sheetLangSelect) {
+    sheetLangSelect.addEventListener('change', (e) => {
+      langSelect.value = e.target.value;
+      langSelect.dispatchEvent(new Event('change'));
+      syncDrawerControls();
+    });
+  }
+
+  if (sheetOrientPortrait) {
+    sheetOrientPortrait.addEventListener('click', () => {
+      if (isLandscape) orientationToggle.click();
+      syncDrawerControls();
+    });
+  }
+
+  if (sheetOrientLandscape) {
+    sheetOrientLandscape.addEventListener('click', () => {
+      if (!isLandscape) orientationToggle.click();
+      syncDrawerControls();
+    });
+  }
+
+  if (sheetBtnSample) {
+    sheetBtnSample.addEventListener('click', () => {
+      btnLoadSample.click();
+      toggleBottomSheet(false);
+    });
+  }
+
+  // Setup GitHub Primer Carbon Dark / Light Mode Toggle
+  function updateThemeModeIcon(mode) {
+    if (!btnThemeMode) return;
+    if (mode === 'dark') {
+      btnThemeMode.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M9.598 1.591a.749.749 0 0 1 .785-.175 7.001 7.001 0 1 1-8.967 8.967.75.75 0 0 1 .961-.96 5.5 5.5 0 0 0 7.046-7.046.75.75 0 0 1 .175-.786Zm1.616 1.945a7 7 0 0 1-7.678 7.678 5.499 5.499 0 1 0 7.678-7.678Z"></path>
+      </svg>`;
+      btnThemeMode.title = 'Switch to Light mode';
+    } else {
+      btnThemeMode.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM8 0a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0Zm0 13a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 8 13ZM2.343 2.343a.75.75 0 0 1 1.061 0l1.06 1.061a.75.75 0 0 1-1.06 1.06l-1.06-1.06a.75.75 0 0 1 0-1.06Zm9.193 9.193a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.061ZM0 8a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H.75A.75.75 0 0 1 0 8Zm13 0a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5A.75.75 0 0 1 13 8ZM2.343 13.657a.75.75 0 0 1 0-1.06l1.06-1.061a.75.75 0 1 1 1.061 1.06l-1.06 1.061a.75.75 0 0 1-1.061 0Zm9.193-9.193a.75.75 0 0 1 0-1.06l1.06-1.061a.75.75 0 1 1 1.061 1.06l-1.06 1.061a.75.75 0 0 1-1.061 0Z"></path>
+      </svg>`;
+      btnThemeMode.title = 'Switch to Carbon Dark mode';
+    }
+  }
+
+  function toggleColorMode() {
+    const current = document.documentElement.getAttribute('data-color-mode') === 'dark' ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-color-mode', next);
+    localStorage.setItem('md2pdf_color_mode', next);
+    updateThemeModeIcon(next);
+  }
+
+  const savedColorMode = localStorage.getItem('md2pdf_color_mode') || 'light';
+  document.documentElement.setAttribute('data-color-mode', savedColorMode);
+  updateThemeModeIcon(savedColorMode);
+
+  if (btnThemeMode) {
+    btnThemeMode.addEventListener('click', toggleColorMode);
+  }
+
+  // Mobile SP Toolbar Scroll Overflow & Peek Guidance
+  const scrollTrack = document.querySelector('.toolbar-scroll-track');
+  const overflowFade = document.querySelector('.toolbar-overflow-fade');
+
+  if (scrollTrack && overflowFade) {
+    const updateOverflowFade = () => {
+      const isAtEnd = scrollTrack.scrollLeft + scrollTrack.clientWidth >= scrollTrack.scrollWidth - 8;
+      overflowFade.classList.toggle('is-hidden', isAtEnd);
+    };
+    scrollTrack.addEventListener('scroll', updateOverflowFade, { passive: true });
+    window.addEventListener('resize', updateOverflowFade);
+    updateOverflowFade();
+  }
+
+  function setupSpInteractionGuides() {
+    if (window.innerWidth > 768) return;
+
+    // Horizontal Scroll Peek on Toolbar to guide user that formatting strip scrolls
+    if (scrollTrack && !sessionStorage.getItem('md2pdf_sp_scroll_hint')) {
+      sessionStorage.setItem('md2pdf_sp_scroll_hint', 'true');
+      setTimeout(() => {
+        scrollTrack.scrollTo({ left: 70, behavior: 'smooth' });
+        setTimeout(() => {
+          scrollTrack.scrollTo({ left: 0, behavior: 'smooth' });
+        }, 500);
+      }, 600);
+    }
+  }
+  setupSpInteractionGuides();
 });

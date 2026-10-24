@@ -1,6 +1,6 @@
 # md-to-pdf-lite 🚀
 
-> **超轻量、零 Chromium 捆绑包的现代 Markdown 转 PDF 引擎。深度优化中日韩（CJK）排版美学，原生支持 Mermaid 矢量图表、KaTeX 公式、代码高亮与自动化 CI/CD 流水线。**
+> **超轻量、零 Chromium 捆绑包的现代 Markdown 转 PDF 引擎。深度优化中日韩（CJK）排版美学，原生支持 Mermaid 矢量图表、KaTeX 公式与代码高亮。打通从 AI 大模型输出到客户高品质商业交付的“最后一公里”。**
 
 <p align="center">
   <a href="https://d3gwzeb0uub1l.cloudfront.net/"><img src="https://img.shields.io/badge/⚡_在线体验-Web_工作台-3b82f6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="在线体验"></a>
@@ -12,6 +12,20 @@
 <p align="center">
   <a href="README.md"><b>English</b></a> | <a href="README.zh-CN.md"><b>简体中文</b></a> | <a href="README.ja.md"><b>日本語</b></a>
 </p>
+
+---
+
+## 🌟 核心背景：打通从 AI 生成到客户交付的“最后一公里”
+
+随着生成式 AI（ChatGPT、Claude、DeepSeek 等大模型）的全面普及，**Markdown 已经事实成为 AI 输出结构化内容的“标准通用语言”**。无论是由 AI 起草的技术规格书、商业提案、需求分析、报价单还是咨询报告，AI 都能在数秒内生成结构完整、条理清晰的 Markdown 文本、专业表格与 Mermaid 架构图。
+
+然而在现实商业与团队协作中，**原始 Markdown 无法直接交付给客户**：
+- 🏢 **客户与决策层需要专业交付件**：客户要的不是聊天窗口截图，也不是粗糙的纯文本，而是一份**排版精美、字体规范、具有商务质感且即可打印签署的商业级 PDF 报告**；
+- ⏳ **传统排版流程繁琐且脆弱**：手动复制 Markdown 到 Word 或 Pages 重新排版耗时耗力，表格列宽、代码高亮、数学公式与 Mermaid 矢量图极易错乱变形；
+- 🔒 **在线工具隐藏数据合规风险**：市面上的许多 SaaS 网页转换工具要求上传整个文档，对于涉及 NDA、企业报价或技术架构的敏感内容存在严重的隐私泄露隐患。
+
+**`md-to-pdf-lite` 正是为打通这“最后一公里”而生：**  
+无需配置庞大笨重的环境，运行过程 100% 本地离线隐私安全，秒级将 AI 创作的 Markdown 转化为具备商用印刷品质的 PDF 文件。配合内置的所见即所得编辑器、智能分页胶囊以及经典商务/技术预设，让 AI 生产力瞬间转化为专业客户交付成果。
 
 ---
 

@@ -70,13 +70,35 @@ function isExplicitPageBreak(el) {
   return false;
 }
 
+let measurementSandbox = null;
+
+function getOrCreateMeasurementSandbox() {
+  if (typeof document === 'undefined') return null;
+  if (!measurementSandbox) {
+    measurementSandbox = document.createElement('div');
+    measurementSandbox.id = 'pagination-measurement-sandbox';
+    measurementSandbox.style.cssText = `
+      position: fixed !important;
+      left: -99999px !important;
+      top: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      z-index: -9999 !important;
+      opacity: 0 !important;
+      overflow: hidden !important;
+    `;
+    document.body.appendChild(measurementSandbox);
+  }
+  return measurementSandbox;
+}
+
 /**
  * Calculates exact page pagination mirroring Chromium print layout.
  *
  * @param {HTMLElement} editorSurface - The .editor-surface container
  * @param {string} format - 'A4' | 'Letter' | 'A3' | 'Legal'
  * @param {boolean} isLandscape - whether orientation is landscape
- * @returns {{ totalPages: number, breakOffsets: Array<{ page: number, topPx: number, isManual: boolean }> }}
+ * @returns {{ totalPages: number, breakOffsets: Array<{ page: number, topPx: number, isManual: boolean, element?: HTMLElement }> }}
  */
 export function calculateExactPagination(editorSurface, format = 'A4', isLandscape = false) {
   const geometry = getPaperGeometry(format, isLandscape);
@@ -94,17 +116,48 @@ export function calculateExactPagination(editorSurface, format = 'A4', isLandsca
   const surfaceRect = editorSurface.getBoundingClientRect();
   const pageHeight = geometry.contentHeightPx;
 
+  // Check if current editorSurface width matches physical PDF paper geometry.
+  // On mobile/SP (<768px), UI paper width is scaled to 100% of viewport to provide
+  // a fluid typing view. In that case, we MUST perform pagination calculation inside
+  // an off-screen fixed-geometry sandbox to guarantee 100% parity with Puppeteer's PDF print output!
+  const needsSandbox = Math.abs(surfaceRect.width - geometry.totalWidthPx) > 10;
+  let targetSurface = editorSurface;
+  let targetChildren = children;
+  let targetRect = surfaceRect;
+
+  if (needsSandbox) {
+    const sandbox = getOrCreateMeasurementSandbox();
+    if (sandbox) {
+      sandbox.className = editorSurface.className;
+      sandbox.style.setProperty('width', `${geometry.totalWidthPx}px`, 'important');
+      sandbox.style.setProperty('max-width', `${geometry.totalWidthPx}px`, 'important');
+      sandbox.style.setProperty('min-width', `${geometry.totalWidthPx}px`, 'important');
+      sandbox.style.setProperty('padding-top', `${geometry.marginTopPx}px`, 'important');
+      sandbox.style.setProperty('padding-bottom', `${geometry.marginBottomPx}px`, 'important');
+      sandbox.style.setProperty('padding-left', `${geometry.marginLeftPx}px`, 'important');
+      sandbox.style.setProperty('padding-right', `${geometry.marginRightPx}px`, 'important');
+      sandbox.style.setProperty('box-sizing', 'border-box', 'important');
+
+      sandbox.innerHTML = proseMirror.outerHTML;
+      targetSurface = sandbox;
+      const sandboxProse = sandbox.querySelector('.ProseMirror') || sandbox;
+      targetChildren = Array.from(sandboxProse.children);
+      targetRect = sandbox.getBoundingClientRect();
+    }
+  }
+
   let currentPage = 1;
   let pageStartTop = null;
   const breakOffsets = [];
 
-  for (let i = 0; i < children.length; i++) {
-    const el = children[i];
+  for (let i = 0; i < targetChildren.length; i++) {
+    const el = targetChildren[i];
+    const sourceEl = children[i] || el;
     if (el.style.display === 'none' || el.classList.contains('page-guides-overlay')) continue;
 
     const elRect = el.getBoundingClientRect();
-    // 100% precise visual pixel coordinate relative to editorSurface
-    const top = Math.round(elRect.top - surfaceRect.top);
+    // 100% precise visual pixel coordinate relative to targetSurface
+    const top = Math.round(elRect.top - targetRect.top);
     const height = Math.round(elRect.height);
     const bottom = top + height;
 
@@ -118,7 +171,7 @@ export function calculateExactPagination(editorSurface, format = 'A4', isLandsca
         page: currentPage,
         topPx: top,
         isManual: true,
-        element: el
+        element: sourceEl
       });
       currentPage++;
       // After an explicit break, the next page starts at the very next content element!
@@ -129,19 +182,25 @@ export function calculateExactPagination(editorSurface, format = 'A4', isLandsca
     const offsetInPage = top - pageStartTop;
     const bottomInPage = offsetInPage + height;
 
+    // Chromium print layout tolerance: margins at the bottom of the page collapse naturally.
+    // Also, if the immediate next element is an explicit PageBreak, avoid splitting right before it.
+    const PAGE_BOTTOM_TOLERANCE = 14;
+    const nextChild = targetChildren[i + 1];
+    const nextIsManualBreak = nextChild && isExplicitPageBreak(nextChild);
+    const effectiveLimit = nextIsManualBreak ? (pageHeight + 28) : (pageHeight + PAGE_BOTTOM_TOLERANCE);
+
     // 2. Headings with break-after: avoid
     if (/^H[1-6]$/.test(el.tagName)) {
-      const nextEl = children[i + 1];
-      const nextH = (nextEl && nextEl.style.display !== 'none' && !isExplicitPageBreak(nextEl))
-        ? Math.round(nextEl.getBoundingClientRect().height)
+      const nextH = (nextChild && nextChild.style.display !== 'none' && !isExplicitPageBreak(nextChild))
+        ? Math.round(nextChild.getBoundingClientRect().height)
         : 0;
 
-      if (offsetInPage + height + nextH > pageHeight && offsetInPage > 20) {
+      if (offsetInPage + height + nextH > effectiveLimit && offsetInPage > 20) {
         breakOffsets.push({
           page: currentPage,
           topPx: top,
           isManual: false,
-          element: el
+          element: sourceEl
         });
         currentPage++;
         pageStartTop = top;
@@ -151,12 +210,12 @@ export function calculateExactPagination(editorSurface, format = 'A4', isLandsca
 
     // 3. Unbreakable block elements (break-inside: avoid)
     if (isBreakInsideAvoid(el)) {
-      if (bottomInPage > pageHeight && offsetInPage > 20) {
+      if (bottomInPage > effectiveLimit && offsetInPage > 20) {
         breakOffsets.push({
           page: currentPage,
           topPx: top,
           isManual: false,
-          element: el
+          element: sourceEl
         });
         currentPage++;
         pageStartTop = top;
@@ -165,13 +224,13 @@ export function calculateExactPagination(editorSurface, format = 'A4', isLandsca
     }
 
     // 4. Standard flow elements (paragraphs / lists / dividers)
-    if (bottomInPage > pageHeight && offsetInPage > 20) {
+    if (bottomInPage > effectiveLimit && offsetInPage > 20) {
       const splitTop = pageStartTop + pageHeight;
       breakOffsets.push({
         page: currentPage,
         topPx: splitTop,
         isManual: false,
-        element: el
+        element: sourceEl
       });
       currentPage++;
       pageStartTop = splitTop;
@@ -207,6 +266,7 @@ export function renderPageGuides(editorSurface, breakOffsets, format = 'A4', isL
   // Update manual pagebreak node badges with dynamic page numbers
   breakOffsets.forEach((b) => {
     if (b.isManual && b.element) {
+      b.element.classList.add('page-guide-marker');
       const titleEl = b.element.querySelector('.page-break-title');
       if (titleEl) {
         titleEl.textContent = `Page Break · Page ${b.page} End · 改ページ`;

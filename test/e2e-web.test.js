@@ -302,7 +302,350 @@ async function testWebStudioE2E() {
       verifiedPdf.pageCount,
       `Web calculated pages (${webData.webPages}) must exactly match PDF engine pages (${verifiedPdf.pageCount})`
     );
-    console.log(`    ✔ 1:1 Parity Confirmed: Web UI calculated ${webData.webPages} pages === PDF engine generated ${verifiedPdf.pageCount} pages`);
+    console.log(`    ✔ 1:1 Parity Confirmed (Sample Doc): Web UI calculated ${webData.webPages} pages === PDF engine generated ${verifiedPdf.pageCount} pages`);
+
+    // Verify 1:1 Parity for Chinese Sample
+    await page.evaluate(() => {
+      document.getElementById('btn-lang-zh')?.click();
+    });
+    await new Promise(r => setTimeout(r, 400));
+    const zhWebData = await page.evaluate(() => {
+      const md = document.getElementById('raw-markdown-editor')?.value;
+      const statPages = document.getElementById('stat-pages')?.textContent;
+      const match = statPages.match(/(\d+)\s+page/);
+      return {
+        markdown: md,
+        webPages: match ? Number(match[1]) : 0
+      };
+    });
+    const zhPdfResult = await convert({
+      markdown: zhWebData.markdown,
+      theme: 'clean',
+      format: 'A4'
+    });
+    const zhVerifiedPdf = await verifyPdf(zhPdfResult.buffer);
+    assert.strictEqual(
+      zhWebData.webPages,
+      zhVerifiedPdf.pageCount,
+      `Chinese Sample: Web calculated pages (${zhWebData.webPages}) must exactly match PDF engine pages (${zhVerifiedPdf.pageCount})`
+    );
+    console.log(`    ✔ 1:1 Parity Confirmed (Chinese Sample): Web UI ${zhWebData.webPages} pages === PDF engine ${zhVerifiedPdf.pageCount} pages`);
+
+    // Verify 1:1 Parity for Japanese Sample
+    await page.evaluate(() => {
+      document.getElementById('btn-lang-ja')?.click();
+    });
+    await new Promise(r => setTimeout(r, 400));
+    const jaWebData = await page.evaluate(() => {
+      const md = document.getElementById('raw-markdown-editor')?.value;
+      const statPages = document.getElementById('stat-pages')?.textContent;
+      const match = statPages.match(/(\d+)\s+page/);
+      return {
+        markdown: md,
+        webPages: match ? Number(match[1]) : 0
+      };
+    });
+    // Verify 1:1 Parity for Japanese Sample across BOTH default Clean theme and Corporate-JA
+    const jaPdfResultClean = await convert({
+      markdown: jaWebData.markdown,
+      theme: 'clean',
+      format: 'A4'
+    });
+    const jaVerifiedPdfClean = await verifyPdf(jaPdfResultClean.buffer);
+    assert.strictEqual(
+      jaWebData.webPages,
+      jaVerifiedPdfClean.pageCount,
+      `Japanese Sample in Clean Theme: Web calculated pages (${jaWebData.webPages}) must exactly match PDF engine pages (${jaVerifiedPdfClean.pageCount})`
+    );
+    console.log(`    ✔ 1:1 Parity Confirmed (Japanese Sample · Clean Theme): Web UI ${jaWebData.webPages} pages === Physical PDF stream ${jaVerifiedPdfClean.pageCount} pages`);
+
+    const jaPdfResultCorp = await convert({
+      markdown: jaWebData.markdown,
+      theme: 'corporate-ja',
+      format: 'A4'
+    });
+    const jaVerifiedPdfCorp = await verifyPdf(jaPdfResultCorp.buffer);
+    assert.strictEqual(
+      jaWebData.webPages,
+      jaVerifiedPdfCorp.pageCount,
+      `Japanese Sample in Corporate-JA Theme: Web calculated pages (${jaWebData.webPages}) must match PDF engine pages (${jaVerifiedPdfCorp.pageCount})`
+    );
+    console.log(`    ✔ 1:1 Parity Confirmed (Japanese Sample · Corporate-JA Theme): Web UI ${jaWebData.webPages} pages === Physical PDF stream ${jaVerifiedPdfCorp.pageCount} pages`);
+
+    // Switch back to default sample doc for pill navigation testing
+    await page.evaluate(() => {
+      document.getElementById('btn-load-sample').click();
+    });
+    await new Promise(r => setTimeout(r, 400));
+
+    // Test 12: Floating Page Pill [ ▲ ] 1/2 [ ▼ ] Navigation & Scroll Response
+    console.log('  ▶ Test 3.12: Verify Floating Page Pill [ ▲ ] 1/2 [ ▼ ] layout & scroll navigation');
+    const pillLayout = await page.evaluate(() => {
+      const pill = document.getElementById('floating-page-pill');
+      const prevBtn = document.getElementById('pill-prev');
+      const nextBtn = document.getElementById('pill-next');
+      const textSpan = document.getElementById('pill-text');
+      const workspace = document.querySelector('.editor-workspace');
+
+      // Check structure: prev is first, next is last, separated by text
+      const children = Array.from(pill.children);
+      const prevIdx = children.indexOf(prevBtn);
+      const nextIdx = children.indexOf(nextBtn);
+
+      return {
+        hasPill: !!pill,
+        hasPrev: !!prevBtn,
+        hasNext: !!nextBtn,
+        isPrevDisabled: prevBtn.disabled,
+        isNextDisabled: nextBtn.disabled,
+        prevBeforeNext: prevIdx < nextIdx,
+        pillText: textSpan?.textContent || '',
+        initialScrollTop: workspace?.scrollTop || 0
+      };
+    });
+
+    assert.ok(pillLayout.hasPill, 'Floating page pill must exist');
+    assert.ok(pillLayout.hasPrev && pillLayout.hasNext, 'Pill must have separated [▲] and [▼] buttons');
+    assert.ok(pillLayout.prevBeforeNext, '[▲] button must be placed on the left and [▼] on the right');
+    assert.ok(pillLayout.isPrevDisabled, 'Prev button [▲] must be disabled on page 1');
+    assert.ok(!pillLayout.isNextDisabled, 'Next button [▼] must be enabled on page 1 when total pages > 1');
+    assert.ok(pillLayout.pillText.startsWith('1 / 2'), `Pill text should start with "1 / 2", got "${pillLayout.pillText}"`);
+
+    // Click [▼] (Next Page) button
+    await page.evaluate(() => {
+      document.getElementById('pill-next').click();
+    });
+    // Wait for smooth scroll animation to finish
+    await new Promise(r => setTimeout(r, 600));
+
+    const afterNextScroll = await page.evaluate(() => {
+      const workspace = document.querySelector('.editor-workspace');
+      const prevBtn = document.getElementById('pill-prev');
+      const nextBtn = document.getElementById('pill-next');
+      const textSpan = document.getElementById('pill-text');
+      return {
+        scrollTop: workspace?.scrollTop || 0,
+        isPrevDisabled: prevBtn.disabled,
+        isNextDisabled: nextBtn.disabled,
+        pillText: textSpan?.textContent || ''
+      };
+    });
+
+    assert.ok(afterNextScroll.scrollTop > 50, `Clicking [▼] must scroll editor workspace down, got scrollTop: ${afterNextScroll.scrollTop}`);
+    assert.ok(!afterNextScroll.isPrevDisabled, 'Prev button [▲] should now be enabled on page 2');
+    assert.ok(afterNextScroll.isNextDisabled, 'Next button [▼] should now be disabled on last page (page 2)');
+    assert.ok(afterNextScroll.pillText.startsWith('2 / 2'), `Pill text should update to "2 / 2", got "${afterNextScroll.pillText}"`);
+
+    // Click [▲] (Prev Page) button to scroll back to top
+    await page.evaluate(() => {
+      document.getElementById('pill-prev').click();
+    });
+    await new Promise(r => setTimeout(r, 600));
+
+    const afterPrevScroll = await page.evaluate(() => {
+      const workspace = document.querySelector('.editor-workspace');
+      const prevBtn = document.getElementById('pill-prev');
+      const nextBtn = document.getElementById('pill-next');
+      const textSpan = document.getElementById('pill-text');
+      return {
+        scrollTop: workspace?.scrollTop || 0,
+        isPrevDisabled: prevBtn.disabled,
+        isNextDisabled: nextBtn.disabled,
+        pillText: textSpan?.textContent || ''
+      };
+    });
+
+    assert.ok(afterPrevScroll.scrollTop < 50, `Clicking [▲] must scroll editor workspace back to top, got scrollTop: ${afterPrevScroll.scrollTop}`);
+    assert.ok(afterPrevScroll.isPrevDisabled, 'Prev button [▲] should be disabled again on page 1');
+    assert.ok(afterPrevScroll.pillText.startsWith('1 / 2'), `Pill text should be "1 / 2", got "${afterPrevScroll.pillText}"`);
+    console.log('    ✔ Floating page pill navigation verified: [▲] 1/2 [▼] layout, smooth scrolling & button states');
+
+    // Test 13: SP Mobile Viewport (375px / 500px) 1:1 Pagination Parity & Mobile UX Guiding
+    console.log('  ▶ Test 3.13: Verify SP Mobile Viewport 1:1 Pagination Parity & Mobile Guiding');
+    // Emulate mobile phone screen (375x667 iPhone SE)
+    await page.setViewport({ width: 375, height: 667, isMobile: true, hasTouch: true });
+    await new Promise(r => setTimeout(r, 400));
+
+    // Switch to Japanese sample doc (contains 1700+ chars, tables, Mermaid, formulas)
+    await page.evaluate(() => {
+      document.getElementById('btn-lang-ja')?.click();
+    });
+    await new Promise(r => setTimeout(r, 600));
+
+    const spInfo = await page.evaluate(() => {
+      // 1. Tool-pagebreak placed at the very first position in the toolbar (icon-only, compact)
+      const scrollTrack = document.querySelector('.toolbar-scroll-track');
+      const firstGroup = scrollTrack?.firstElementChild;
+      const firstButton = firstGroup?.querySelector('button');
+      const pagebreakBtn = document.getElementById('tool-pagebreak');
+      const pagebreakTitle = pagebreakBtn?.title || '';
+
+      // 2. Mobile SP header shows MD2PDF and clean settings trigger
+      const brandMobile = document.querySelector('.brand-title-mobile');
+      const brandMobileStyle = brandMobile ? window.getComputedStyle(brandMobile).display : 'none';
+      const spSettingsBtn = document.getElementById('btn-sp-settings');
+      const spSettingsComputed = spSettingsBtn ? window.getComputedStyle(spSettingsBtn).display : 'none';
+
+      // 3. Page break node in editor: in normal flow & fully interactive (never penetrates to background editor)
+      const pageBreakNode = document.querySelector('.page-break-node');
+      const pageBreakComputed = pageBreakNode ? window.getComputedStyle(pageBreakNode) : null;
+      const pageBreakPill = pageBreakNode?.querySelector('.page-break-pill');
+      const btnUp = pageBreakNode?.querySelector('.btn-break-up');
+      const btnDown = pageBreakNode?.querySelector('.btn-break-down');
+
+      // 4. Footer clean single-line status & no Puppeteer developer jargon
+      const footer = document.querySelector('.studio-footer');
+      const footerStatus = document.getElementById('footer-status-text');
+      const footerStatusVisible = footerStatus ? (window.getComputedStyle(footerStatus).display !== 'none') : false;
+      const footerStatusText = footerStatus?.textContent || '';
+      const footerScrollHeight = footer?.scrollHeight || 0;
+      const footerClientHeight = footer?.clientHeight || 0;
+
+      // 5. Exact pagination calculation in mobile view
+      const statPages = document.getElementById('stat-pages')?.textContent || '';
+      const match = statPages.match(/(\d+)\s+page/);
+      const spCalculatedPages = match ? Number(match[1]) : 0;
+      const rawMarkdown = document.getElementById('raw-markdown-editor')?.value || '';
+
+      return {
+        isPagebreakFirst: firstButton?.id === 'tool-pagebreak',
+        hasPagebreakBtn: !!pagebreakBtn,
+        pagebreakTitle,
+        brandMobileVisible: brandMobileStyle !== 'none',
+        brandMobileText: brandMobile?.textContent?.trim() || '',
+        spSettingsVisible: spSettingsComputed !== 'none',
+        hasPageBreakNode: !!pageBreakNode,
+        pageBreakPosition: pageBreakComputed?.position || '',
+        pageBreakPointerEvents: pageBreakComputed?.pointerEvents || '',
+        hasPill: !!pageBreakPill,
+        hasActionButtons: !!(btnUp && btnDown),
+        footerNoJargon: !footerStatusText.includes('Puppeteer'),
+        footerStatusHiddenOnMobile: !footerStatusVisible,
+        footerSingleLine: footerScrollHeight <= footerClientHeight + 3,
+        spCalculatedPages,
+        rawMarkdown
+      };
+    });
+
+    assert.ok(spInfo.isPagebreakFirst, 'tool-pagebreak MUST be the very first tool button in the menu');
+    assert.ok(spInfo.pagebreakTitle.includes('改ページ'), 'Pagebreak button should have tooltip with "改ページ" in ja');
+    assert.ok(spInfo.brandMobileVisible, 'Brand title mobile MD2PDF must be visible on SP');
+    assert.strictEqual(spInfo.brandMobileText, 'MD2PDF', 'Mobile brand name must be concise "MD2PDF"');
+    assert.ok(spInfo.spSettingsVisible, 'SP Settings trigger button must be visible in mobile viewport');
+    assert.ok(spInfo.hasPageBreakNode, 'Document must contain at least 1 page-break node');
+    assert.strictEqual(spInfo.pageBreakPosition, 'relative', 'PageBreak node must be relative in-flow (never absolute over text)');
+    assert.strictEqual(spInfo.pageBreakPointerEvents, 'auto', 'PageBreak node must have pointer-events: auto (never penetrable)');
+    assert.ok(spInfo.hasActionButtons, 'PageBreak node must have mobile up/down action buttons for easy manipulation');
+    assert.ok(spInfo.footerNoJargon, 'Footer must not contain developer jargon like "Puppeteer"');
+    assert.ok(spInfo.footerStatusHiddenOnMobile, 'Footer verbose status text should be hidden on SP to prevent line breaks');
+    assert.ok(spInfo.footerSingleLine, 'Footer must fit in a single neat line without wrapping on mobile');
+    assert.ok(spInfo.spCalculatedPages > 0, 'SP calculated pages must be greater than 0');
+
+    // Compile the exact same markdown via backend Puppeteer print engine
+    const spPdfResult = await convert({
+      markdown: spInfo.rawMarkdown,
+      theme: 'clean',
+      format: 'A4'
+    });
+    const spVerifiedPdf = await verifyPdf(spPdfResult.buffer);
+
+    assert.strictEqual(
+      spInfo.spCalculatedPages,
+      spVerifiedPdf.pageCount,
+      `Mobile SP calculated pages (${spInfo.spCalculatedPages}) must 100% match physical PDF pages (${spVerifiedPdf.pageCount}) without line-wrap inflation!`
+    );
+    console.log(`    ✔ SP 1:1 Parity Confirmed: Mobile calculated ${spInfo.spCalculatedPages} pages === Physical PDF ${spVerifiedPdf.pageCount} pages`);
+
+    // Further verify the exact 3-page scenario mentioned by user:
+    // When a document outputs 3 pages in physical PDF, mobile SP must calculate EXACTLY 3 pages (never inflated to 4 by narrow viewport wrapping)
+    await page.evaluate(() => {
+      const modeRaw = document.getElementById('mode-raw');
+      const modeVisual = document.getElementById('mode-visual');
+      const textarea = document.getElementById('raw-markdown-editor');
+      modeRaw.click();
+      textarea.value = '# 1ページ目: プロジェクト概要\n\n' +
+        'クラウドネイティブなPDF変換スタジオの基本設計です。\n\n' +
+        '| 項目 | 内容 |\n| :--- | :--- |\n| エンジン | Chromium Headless |\n\n' +
+        '<!-- pagebreak -->\n\n' +
+        '# 2ページ目: アーキテクチャ詳細\n\n' +
+        'コンテナベースのサーバーレス実行環境とCJKタイポグラフィ最適化を実施します。\n\n' +
+        '<!-- pagebreak -->\n\n' +
+        '# 3ページ目: 付録・仕様基準\n\n' +
+        'モバイル端末の狭小ビューポート（375px〜500px）でも、物理A4印刷サイズに完全に準拠して3ページと正確に判定されます。\n';
+      modeVisual.click();
+    });
+    await new Promise(r => setTimeout(r, 600));
+
+    const sp3PageData = await page.evaluate(() => {
+      const statPages = document.getElementById('stat-pages')?.textContent || '';
+      const match = statPages.match(/(\d+)\s+page/);
+      const sp3Pages = match ? Number(match[1]) : 0;
+      const rawMarkdown = document.getElementById('raw-markdown-editor')?.value || '';
+      return { sp3Pages, rawMarkdown };
+    });
+
+    const sp3PdfResult = await convert({
+      markdown: sp3PageData.rawMarkdown,
+      theme: 'clean',
+      format: 'A4'
+    });
+    const sp3VerifiedPdf = await verifyPdf(sp3PdfResult.buffer);
+
+    assert.strictEqual(sp3VerifiedPdf.pageCount, 3, 'Backend physical PDF must be exactly 3 pages');
+    assert.strictEqual(
+      sp3PageData.sp3Pages,
+      3,
+      `Mobile SP UI must calculate exactly 3 pages, got ${sp3PageData.sp3Pages} (Fixing inflation to 4 bug)`
+    );
+    assert.strictEqual(
+      sp3PageData.sp3Pages,
+      sp3VerifiedPdf.pageCount,
+      `Mobile SP 3-page parity: Calculated pages (${sp3PageData.sp3Pages}) must 100% match physical PDF pages (${sp3VerifiedPdf.pageCount})!`
+    );
+    console.log(`    ✔ SP 3-Page Parity Confirmed: Mobile calculated exactly 3 pages === Physical PDF 3 pages (Never inflated to 4!)`);
+    console.log(`    ✔ SP UI Validated: PageBreak at first pos, SP guiding tip present, footer clean single-line without jargon`);
+
+    // Test 14: Direct Physical PDF Binary Stream Verification
+    console.log('  ▶ Test 3.14: Direct Physical PDF Binary Stream Verification for Japanese Document');
+    // Load Japanese sample document cleanly
+    await page.evaluate(() => {
+      const select = document.getElementById('lang-select');
+      if (select) {
+        select.value = 'ja';
+        select.dispatchEvent(new Event('change'));
+      }
+      document.getElementById('btn-load-sample')?.click();
+    });
+    await new Promise(r => setTimeout(r, 600));
+
+    const directExportData = await page.evaluate(() => {
+      const statPages = document.getElementById('stat-pages')?.textContent || '';
+      const match = statPages.match(/(\d+)\s+page/);
+      const webPages = match ? Number(match[1]) : 0;
+      const md = document.getElementById('raw-markdown-editor')?.value;
+      const theme = document.getElementById('theme-select')?.value || 'clean';
+      const format = document.getElementById('format-select')?.value || 'A4';
+      return { webPages, md, theme, format };
+    });
+
+    const directPdfRes = await convert({
+      markdown: directExportData.md,
+      theme: directExportData.theme,
+      format: directExportData.format
+    });
+
+    const directVerifiedPdf = await verifyPdf(directPdfRes.buffer);
+    assert.strictEqual(
+      directVerifiedPdf.pageCount,
+      directExportData.webPages,
+      `Physical PDF stream page count (${directVerifiedPdf.pageCount}) MUST EXACTLY MATCH Web UI page count (${directExportData.webPages})!`
+    );
+    assert.strictEqual(
+      directVerifiedPdf.pageCount,
+      2,
+      `Expected Japanese sample document to be cleanly formatted into exactly 2 pages, got ${directVerifiedPdf.pageCount}`
+    );
+    console.log(`    ✔ Physical PDF Stream Asserted: Web UI (${directExportData.webPages} pages) === Physical PDF Stream (${directVerifiedPdf.pageCount} pages, ${directVerifiedPdf.byteSize} bytes)`);
 
   } finally {
     if (browser) await browser.close();

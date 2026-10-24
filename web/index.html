@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>md-to-pdf Studio | Serverless CJK PDF Generator</title>
   <meta name="description" content="Commercial-grade Markdown to PDF converter with CJK typography, KaTeX formula support, and serverless acceleration." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,72 +13,89 @@
 </head>
 <body>
   <div id="app" class="app-layout">
-    <!-- Top Header -->
+    <!-- Top Header: GitHub Primer Minimalist Top Bar (48px) -->
     <header class="studio-header">
       <div class="header-brand">
-        <div class="brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
+        <div class="brand-icon" title="md-to-pdf-lite">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path>
           </svg>
         </div>
-        <div class="brand-text">
-          <h1 id="app-title">md-to-pdf studio</h1>
-          <span id="app-badge" class="badge-serverless">Serverless Lite</span>
+        <div class="brand-title-wrap">
+          <h1 id="app-title" class="brand-title">
+            <span class="brand-title-desktop">md-to-pdf Studio</span>
+            <span class="brand-title-mobile">MD2PDF</span>
+          </h1>
+          <span id="app-badge" class="badge-serverless" style="display: none;">Serverless Lite</span>
         </div>
+        <span id="doc-filename-display" class="brand-doc-name" title="Derived from first H1 heading">document.pdf</span>
       </div>
 
       <!-- Quick Action Controls -->
-      <div class="header-controls">
-        <!-- Language Switcher -->
-        <div class="control-item">
-          <select id="lang-select" class="select-pill" aria-label="Select Language">
-            <option value="en">🇺🇸 English</option>
-            <option value="zh-CN">🇨🇳 简体中文</option>
-            <option value="ja">🇯🇵 日本語</option>
-          </select>
+      <div class="header-actions">
+        <!-- Desktop Inline Joined Page Setup Group -->
+        <div class="desktop-page-setup">
+          <div class="setup-item">
+            <label id="theme-label" for="theme-select" class="visually-hidden">Theme</label>
+            <select id="theme-select" class="setup-select" title="Theme">
+              <option value="clean" selected>Clean Business</option>
+              <option value="corporate-ja">Corporate Navy (JA)</option>
+              <option value="github">GitHub Tech</option>
+            </select>
+          </div>
+
+          <div class="setup-item">
+            <label id="format-label" for="format-select" class="visually-hidden">Size</label>
+            <select id="format-select" class="setup-select" title="Paper Size">
+              <option value="A4" selected>A4</option>
+              <option value="Letter">Letter</option>
+              <option value="A3">A3</option>
+              <option value="Legal">Legal</option>
+            </select>
+          </div>
+
+          <div class="setup-item">
+            <button id="orientation-toggle" class="setup-btn" type="button" title="Toggle Orientation">
+              <svg id="orientation-icon" class="icon-orientation" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M3.75 1.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25h-8.5ZM2 1.75C2 .784 2.784 0 3.75 0h8.5C13.216 0 14 .784 14 1.75v12.5A1.75 1.75 0 0 1 12.25 16h-8.5A1.75 1.75 0 0 1 2 14.25V1.75Z"></path>
+              </svg>
+              <span id="orientation-text">Portrait</span>
+            </button>
+          </div>
+
+          <div class="setup-item">
+            <select id="lang-select" class="setup-select" title="Language" aria-label="Select Language">
+              <option value="en">English</option>
+              <option value="zh-CN">简体中文</option>
+              <option value="ja">日本語</option>
+            </select>
+          </div>
         </div>
 
-        <!-- Theme Picker -->
-        <div class="control-item">
-          <label id="theme-label" for="theme-select" class="control-label">Theme</label>
-          <select id="theme-select" class="select-pill">
-            <option value="clean" selected>Clean Business</option>
-            <option value="corporate-ja">Corporate Navy (JA)</option>
-            <option value="github">GitHub Tech</option>
-          </select>
-        </div>
-
-        <!-- Paper Size -->
-        <div class="control-item">
-          <label id="format-label" for="format-select" class="control-label">Size</label>
-          <select id="format-select" class="select-pill">
-            <option value="A4" selected>A4</option>
-            <option value="Letter">Letter</option>
-            <option value="A3">A3</option>
-            <option value="Legal">Legal</option>
-          </select>
-        </div>
-
-        <!-- Orientation Toggle -->
-        <div class="control-item">
-          <button id="orientation-toggle" class="btn-ghost" title="Toggle Orientation">
-            <svg id="orientation-icon" class="icon-orientation" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="5" y="2" width="14" height="20" rx="2"></rect>
+        <!-- SP Compact Page Setup Button (Opens Bottom Sheet on Mobile) -->
+        <div class="sp-settings-trigger-wrap">
+          <button id="btn-sp-settings" class="btn-sp-settings" type="button" title="Page & Theme Settings">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492ZM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0Z"></path>
+              <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319Z"></path>
             </svg>
-            <span id="orientation-text">Portrait</span>
+            <span id="sp-summary-badge">Clean · A4</span>
+            <span class="sp-settings-arrow">▾</span>
           </button>
         </div>
 
+        <!-- Dark/Light Mode Toggle Button -->
+        <button id="btn-theme-mode" class="btn-theme-mode" type="button" title="Toggle Light / Carbon Dark mode">
+          <svg class="icon-sun" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM8 0a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0Zm0 13a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 8 13ZM2.343 2.343a.75.75 0 0 1 1.061 0l1.06 1.061a.75.75 0 0 1-1.06 1.06l-1.06-1.06a.75.75 0 0 1 0-1.06Zm9.193 9.193a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.061ZM0 8a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H.75A.75.75 0 0 1 0 8Zm13 0a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5A.75.75 0 0 1 13 8ZM2.343 13.657a.75.75 0 0 1 0-1.06l1.06-1.061a.75.75 0 1 1 1.061 1.06l-1.06 1.061a.75.75 0 0 1-1.061 0Zm9.193-9.193a.75.75 0 0 1 0-1.06l1.06-1.061a.75.75 0 1 1 1.061 1.06l-1.06 1.061a.75.75 0 0 1-1.061 0Z"></path>
+          </svg>
+        </button>
+
         <!-- Export PDF Main CTA -->
-        <button id="btn-export-pdf" class="btn-primary">
-          <svg class="icon-download" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
+        <button id="btn-export-pdf" class="btn-export" type="button">
+          <svg class="icon-download" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z"></path>
+            <path d="M7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06l1.97 1.969Z"></path>
           </svg>
           <span id="export-btn-text">Export PDF</span>
           <span class="spinner" id="export-spinner" style="display: none;"></span>
@@ -86,69 +103,82 @@
       </div>
     </header>
 
-    <!-- Toolbar for Formatting -->
+    <!-- Toolbar for Formatting (Horizontally Scrollable Track + Pinned Mode Controls) -->
     <div class="editor-toolbar" id="editor-toolbar">
-      <div class="toolbar-group">
-        <button id="tool-bold" class="tool-btn" title="Bold (Ctrl+B)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
-        </button>
-        <button id="tool-italic" class="tool-btn" title="Italic (Ctrl+I)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
-        </button>
-        <button id="tool-strike" class="tool-btn" title="Strikethrough">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 4H9a3 3 0 0 0-2.83 4M14 12a4 4 0 0 1 0 8H6"/><line x1="4" y1="12" x2="20" y2="12"/></svg>
-        </button>
+      <div class="toolbar-scroll-wrapper">
+        <div class="toolbar-scroll-track" aria-label="Formatting Tools">
+          <!-- 1. Highlight Feature: Dynamic Page Break is now Group 1 (First in menu) -->
+          <div class="toolbar-group">
+            <button id="tool-pagebreak" class="tool-btn tool-btn-pagebreak" type="button" title="Insert Page Break (改ページ · 动态切页)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="4" y="2" width="16" height="8" rx="1.5" stroke-dasharray="2 2"/>
+                <rect x="4" y="14" width="16" height="8" rx="1.5"/>
+                <line x1="2" y1="11" x2="22" y2="11" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <!-- 2. Typography Styles -->
+          <div class="toolbar-group">
+            <button id="tool-bold" class="tool-btn" type="button" title="Bold (Ctrl+B)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+            </button>
+            <button id="tool-italic" class="tool-btn" type="button" title="Italic (Ctrl+I)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+            </button>
+            <button id="tool-strike" class="tool-btn" type="button" title="Strikethrough">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 4H9a3 3 0 0 0-2.83 4M14 12a4 4 0 0 1 0 8H6"/><line x1="4" y1="12" x2="20" y2="12"/></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <!-- 3. Headings -->
+          <div class="toolbar-group">
+            <button id="tool-h1" class="tool-btn heading-btn" type="button" title="Heading 1">H1</button>
+            <button id="tool-h2" class="tool-btn heading-btn" type="button" title="Heading 2">H2</button>
+            <button id="tool-h3" class="tool-btn heading-btn" type="button" title="Heading 3">H3</button>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <!-- 4. Lists, Quotes, Codes, Tables -->
+          <div class="toolbar-group">
+            <button id="tool-bullet" class="tool-btn" type="button" title="Bullet List">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>
+            </button>
+            <button id="tool-ordered" class="tool-btn" type="button" title="Numbered List">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+            </button>
+            <button id="tool-quote" class="tool-btn" type="button" title="Blockquote">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>
+            </button>
+            <button id="tool-code" class="tool-btn" type="button" title="Code Block">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </button>
+            <button id="tool-table" class="tool-btn" type="button" title="Insert Table">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+            </button>
+            <button id="tool-hr" class="tool-btn" type="button" title="Horizontal Divider">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+        <!-- Visual scroll hint fade overlay -->
+        <div class="toolbar-overflow-fade"></div>
       </div>
 
-      <div class="toolbar-divider"></div>
-
-      <div class="toolbar-group">
-        <button id="tool-h1" class="tool-btn heading-btn" title="Heading 1">H1</button>
-        <button id="tool-h2" class="tool-btn heading-btn" title="Heading 2">H2</button>
-        <button id="tool-h3" class="tool-btn heading-btn" title="Heading 3">H3</button>
-      </div>
-
-      <div class="toolbar-divider"></div>
-
-      <div class="toolbar-group">
-        <button id="tool-bullet" class="tool-btn" title="Bullet List">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>
-        </button>
-        <button id="tool-ordered" class="tool-btn" title="Numbered List">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
-        </button>
-        <button id="tool-quote" class="tool-btn" title="Blockquote">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>
-        </button>
-        <button id="tool-code" class="tool-btn" title="Code Block">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        </button>
-        <button id="tool-table" class="tool-btn" title="Insert Table">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
-        </button>
-        <button id="tool-hr" class="tool-btn" title="Horizontal Divider">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>
-        </button>
-        <button id="tool-pagebreak" class="tool-btn" title="Insert Page Break (改ページ)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="4" y="2" width="16" height="8" rx="1.5" stroke-dasharray="2 2"/>
-            <rect x="4" y="14" width="16" height="8" rx="1.5"/>
-            <line x1="2" y1="11" x2="22" y2="11" stroke-width="2"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="toolbar-spacer"></div>
-
-      <!-- Mode & Utility Group -->
-      <div class="toolbar-group">
-        <button id="btn-load-sample" class="btn-subtle" title="Load sample document">
+      <!-- Mode & Utility Group (Pinned Right - Never clipped on SP) -->
+      <div class="toolbar-pinned-right">
+        <button id="btn-load-sample" class="btn-ghost-sm" type="button" title="Load sample document">
           <span id="load-sample-text">Load Sample</span>
         </button>
         
-        <div class="mode-switch">
-          <button id="mode-visual" class="mode-btn active">Visual</button>
-          <button id="mode-raw" class="mode-btn">Markdown</button>
+        <div class="segmented-control" role="tablist">
+          <button id="mode-visual" class="seg-btn active" type="button" role="tab" aria-selected="true">Visual</button>
+          <button id="mode-raw" class="seg-btn" type="button" role="tab" aria-selected="false">Markdown</button>
         </div>
       </div>
     </div>
@@ -161,32 +191,82 @@
       <!-- Raw Markdown Textarea (Synchronized) -->
       <textarea id="raw-markdown-editor" class="raw-markdown-surface" style="display: none;" spellcheck="false" placeholder="Write or paste Markdown here..."></textarea>
 
-      <!-- Floating 1:1 Page Pill Indicator -->
-      <div id="floating-page-pill" class="floating-page-pill" title="Current Page Navigation">
-        <span class="pill-icon">📄</span>
-        <span id="pill-text">Page 1 / 2 (A4)</span>
-        <div class="pill-nav-buttons">
-          <button id="pill-prev" class="pill-arrow-btn" title="Previous Page">▲</button>
-          <button id="pill-next" class="pill-arrow-btn" title="Next Page">▼</button>
+      <!-- Floating 1:1 Page Pill Indicator (Separated layout: [ ▲ ] 1 / 2 [ ▼ ] to prevent SP misclicks) -->
+      <div id="floating-page-pill" class="floating-page-pill" title="ページナビゲーション">
+        <button id="pill-prev" class="pill-nav-btn" type="button" title="前のページへ (Previous Page)" aria-label="Previous Page">▲</button>
+        <div class="pill-center-info">
+          <span class="pill-icon">📄</span>
+          <span id="pill-text">1 / 2 (A4 · 縦)</span>
         </div>
+        <button id="pill-next" class="pill-nav-btn" type="button" title="次のページへ (Next Page)" aria-label="Next Page">▼</button>
       </div>
     </main>
 
-    <!-- Footer Status Bar -->
+    <!-- Footer Status Bar (GitHub Primer 28px Minimalist) -->
     <footer class="studio-footer">
       <div class="footer-stats">
         <span id="stat-words">0 words</span>
-        <span class="stat-bullet">•</span>
-        <span id="stat-chars">0 characters</span>
-        <span class="stat-bullet">•</span>
+        <span class="stat-sep">•</span>
+        <span id="stat-chars">0 chars</span>
+        <span class="stat-sep">•</span>
         <span id="stat-pages">~1 page</span>
       </div>
 
       <div class="footer-info">
         <span class="status-indicator"></span>
-        <span id="footer-status-text">Ready · Puppeteer Serverless Engine</span>
+        <span id="footer-status-text">Ready</span>
       </div>
     </footer>
+
+    <!-- SP Bottom Sheet Drawer (Mobile Page Setup & Actions) -->
+    <div id="drawer-backdrop" class="drawer-backdrop"></div>
+    <aside id="sp-bottom-sheet" class="sp-bottom-sheet" aria-label="Page Settings Drawer">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <span id="sheet-title" class="sheet-title">Page & Layout Settings</span>
+        <button id="sheet-close" class="sheet-close" type="button" aria-label="Close Settings">&times;</button>
+      </div>
+      <div class="sheet-grid">
+        <div class="sheet-row">
+          <span class="sheet-label" id="sheet-theme-label">Theme</span>
+          <select id="sheet-theme-select" class="sheet-control">
+            <option value="clean" selected>Clean Business</option>
+            <option value="corporate-ja">Corporate Navy (JA)</option>
+            <option value="github">GitHub Tech</option>
+          </select>
+        </div>
+        <div class="sheet-row">
+          <span class="sheet-label" id="sheet-format-label">Size</span>
+          <select id="sheet-format-select" class="sheet-control">
+            <option value="A4" selected>A4</option>
+            <option value="Letter">Letter</option>
+            <option value="A3">A3</option>
+            <option value="Legal">Legal</option>
+          </select>
+        </div>
+        <div class="sheet-row">
+          <span class="sheet-label" id="sheet-orient-label">Orientation</span>
+          <div class="sheet-segmented">
+            <button id="sheet-orient-portrait" class="sheet-seg-btn active" type="button">Portrait</button>
+            <button id="sheet-orient-landscape" class="sheet-seg-btn" type="button">Landscape</button>
+          </div>
+        </div>
+        <div class="sheet-row">
+          <span class="sheet-label" id="sheet-lang-label">Language</span>
+          <select id="sheet-lang-select" class="sheet-control">
+            <option value="en">English</option>
+            <option value="zh-CN">简体中文</option>
+            <option value="ja">日本語</option>
+          </select>
+        </div>
+        <div class="sheet-row">
+          <span class="sheet-label" id="sheet-sample-label">Sample</span>
+          <button id="sheet-btn-sample" class="sheet-control sheet-action-btn" type="button">
+            Load Sample Template
+          </button>
+        </div>
+      </div>
+    </aside>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast-notification"></div>

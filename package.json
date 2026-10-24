@@ -1,7 +1,7 @@
 {
   "name": "md-to-pdf-lite",
   "version": "1.0.0",
-  "description": "Ultra-lightweight, zero-chromium-bundle Markdown to PDF converter with CJK typography, KaTeX, and CI/CD support.",
+  "description": "Ultra-lightweight, zero-chromium-bundle Markdown to PDF engine with CJK typography. Bridging the last mile from AI Markdown output to polished client deliverables.",
   "main": "src/index.js",
   "files": [
     "bin",

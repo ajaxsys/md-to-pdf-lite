@@ -1,6 +1,6 @@
 # md-to-pdf-lite 🚀
 
-> **Ultra-lightweight, zero-chromium-bundle Markdown to PDF engine. Optimized for CJK typography, with native support for offline Mermaid vector diagrams, KaTeX formulas, syntax highlighting, and CI/CD pipelines.**
+> **Ultra-lightweight, zero-chromium-bundle Markdown to PDF engine. Optimized for CJK typography with native Mermaid vector diagrams, KaTeX math, and code highlighting. Bridging the "last mile" from AI generation to professional client deliverables.**
 
 <p align="center">
   <a href="https://d3gwzeb0uub1l.cloudfront.net/"><img src="https://img.shields.io/badge/⚡_Live_Demo-Web_Studio-3b82f6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo"></a>
@@ -12,6 +12,20 @@
 <p align="center">
   <a href="README.md"><b>English</b></a> | <a href="README.zh-CN.md"><b>简体中文</b></a> | <a href="README.ja.md"><b>日本語</b></a>
 </p>
+
+---
+
+## 🌟 Core Background: Bridging the "Last Mile" from AI Output to Client Delivery
+
+With the widespread adoption of Generative AI (ChatGPT, Claude, DeepSeek, and other LLMs), **Markdown has become the de facto universal standard output for AI-generated content**. Whether drafting technical specifications, software architecture designs, commercial proposals, client estimates, or consulting reports, modern AI models structure their results in clean Markdown with tables, code blocks, and Mermaid diagrams.
+
+However, in professional business environments, **raw Markdown cannot be handed over directly to clients**:
+- 🏢 **Clients and stakeholders expect polished deliverables**: Clients do not want chat window screenshots or raw text snippets; they expect a **beautifully styled, rigorously formatted, and printable commercial-grade PDF deliverable**;
+- ⏳ **Manual reformatting is tedious and fragile**: Copying and pasting Markdown into Word or Pages wastes hours and often breaks table formatting, code syntax highlighting, LaTeX formulas, and vector diagrams;
+- 🔒 **Online web converters present compliance and privacy hazards**: Third-party SaaS tools require uploading entire documents to external servers, creating unacceptable data leak risks for confidential proposals, trade secrets, and financial estimates.
+
+**`md-to-pdf-lite` is purpose-built to solve this exact "last mile"**:  
+With zero bundled browser bloat and 100% offline data security, it transforms AI-generated Markdown into pixel-perfect, commercial-grade PDFs in seconds. Featuring an interactive WYSIWYG editor with live drag-and-drop pagination and refined business themes, it turns AI productivity into professional client deliverables instantaneously.
 
 ---
 
