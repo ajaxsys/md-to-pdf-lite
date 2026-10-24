@@ -839,7 +839,7 @@ body {
 
 .ProseMirror .tableWrapper {
   overflow-x: auto;
-  margin: 1.4em 0;
+  margin: 20px 0;
   max-width: 100%;
 }
 
@@ -847,8 +847,24 @@ body {
 .ProseMirror table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
+  margin: 0 !important;
   font-size: 0.92rem;
+}
+
+/* Ensure paragraph inside table cells and list items doesn't inflate row height */
+.ProseMirror td p,
+.ProseMirror th p {
+  margin: 0 !important;
+  line-height: inherit;
+}
+
+.ProseMirror li p {
+  margin: 0 !important;
+  line-height: inherit;
+}
+
+.ProseMirror blockquote p:last-child {
+  margin-bottom: 0 !important;
 }
 
 /* Theme: Clean (Booktabs Style matching clean.css PDF) */
