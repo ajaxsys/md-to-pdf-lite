@@ -13,9 +13,11 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 
 import { MermaidNodeView, StandardCodeBlockNodeView } from './mermaid-node-view.js';
 import { PageBreak } from './page-break-extension.js';
+import { MathExtension } from './math-extension.js';
 import { calculateExactPagination, renderPageGuides } from './pagination-engine.js';
 import { translations, getInitialLanguage, setLanguage } from './i18n.js';
 import { solveProofOfWork } from './pow.js';
+import 'katex/dist/katex.min.css';
 
 const CustomCodeBlock = CodeBlockLowlight.extend({
   addNodeView() {
@@ -159,6 +161,7 @@ function initEditor() {
         bulletListMarker: '-'
       }),
       PageBreak,
+      MathExtension,
       Table.configure({ resizable: true }),
       TableRow,
       TableHeader,
