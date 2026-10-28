@@ -17,6 +17,7 @@ import { MathExtension } from './math-extension.js';
 import { calculateExactPagination, renderPageGuides } from './pagination-engine.js';
 import { translations, getInitialLanguage, setLanguage } from './i18n.js';
 import { solveProofOfWork } from './pow.js';
+import { normalizeBoldSpacing } from './markdown-cleaner.js';
 import 'katex/dist/katex.min.css';
 
 const CustomCodeBlock = CodeBlockLowlight.extend({
@@ -52,6 +53,8 @@ const orientationText = document.getElementById('orientation-text');
 const btnExport = document.getElementById('btn-export-pdf');
 const exportBtnText = document.getElementById('export-btn-text');
 const exportSpinner = document.getElementById('export-spinner');
+const btnPrint = document.getElementById('btn-print');
+const printBtnText = document.getElementById('print-btn-text');
 const btnLoadSample = document.getElementById('btn-load-sample');
 const modeVisual = document.getElementById('mode-visual');
 const modeRaw = document.getElementById('mode-raw');
@@ -97,6 +100,23 @@ const sheetLangLabel = document.getElementById('sheet-lang-label');
 const sheetLangSelect = document.getElementById('sheet-lang-select');
 const sheetSampleLabel = document.getElementById('sheet-sample-label');
 const sheetBtnSample = document.getElementById('sheet-btn-sample');
+const sheetPrintLabel = document.getElementById('sheet-print-label');
+const sheetBtnPrint = document.getElementById('sheet-btn-print');
+
+/**
+ * Dynamically synchronize browser print page size and orientation with selected settings
+ */
+function updatePrintOrientation() {
+  let styleEl = document.getElementById('print-orientation-style');
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = 'print-orientation-style';
+    document.head.appendChild(styleEl);
+  }
+  const format = formatSelect ? formatSelect.value || 'A4' : 'A4';
+  const orientation = isLandscape ? 'landscape' : 'portrait';
+  styleEl.textContent = `@media print { @page { size: ${format} ${orientation}; margin: 15mm 12mm; } }`;
+}
 
 /**
  * Apply paper dimensions class to sync canvas with selected format & orientation
@@ -120,17 +140,20 @@ function updatePaperCanvasGeometry() {
     tiptapContainer.classList.remove('is-landscape');
     rawTextarea.classList.remove('is-landscape');
   }
+
+  updatePrintOrientation();
 }
 
 /**
  * Load markdown content into both visual and raw editors
  */
 function loadDocumentContent(markdown) {
+  const normalized = normalizeBoldSpacing(markdown);
   isProgrammatic = true;
   if (editor) {
-    editor.commands.setContent(markdown);
+    editor.commands.setContent(normalized);
   }
-  rawTextarea.value = markdown;
+  rawTextarea.value = normalized;
   hasUserEdited = false;
   updateStats();
   setTimeout(() => {
@@ -143,6 +166,7 @@ function loadDocumentContent(markdown) {
  */
 function initEditor() {
   const t = translations[currentLang];
+  const initialContent = normalizeBoldSpacing(t.sampleDoc);
 
   editor = new Editor({
     element: tiptapContainer,
@@ -158,7 +182,8 @@ function initEditor() {
       Markdown.configure({
         html: true,
         tightLists: true,
-        bulletListMarker: '-'
+        bulletListMarker: '-',
+        transformPastedText: true
       }),
       PageBreak,
       MathExtension,
@@ -174,7 +199,7 @@ function initEditor() {
         placeholder: 'Start writing your document in Markdown...'
       })
     ],
-    content: t.sampleDoc,
+    content: initialContent,
     onUpdate: () => {
       if (!isProgrammatic) {
         hasUserEdited = true;
@@ -184,8 +209,19 @@ function initEditor() {
     }
   });
 
+  // Hook TipTap markdown parser to automatically normalize CJK bold spacing on setContent, insertContentAt, or paste
+  if (editor.storage?.markdown?.parser) {
+    const origParse = editor.storage.markdown.parser.parse.bind(editor.storage.markdown.parser);
+    editor.storage.markdown.parser.parse = function (content, options) {
+      if (typeof content === 'string') {
+        content = normalizeBoldSpacing(content);
+      }
+      return origParse(content, options);
+    };
+  }
+
   // Set initial raw content
-  rawTextarea.value = t.sampleDoc;
+  rawTextarea.value = initialContent;
   hasUserEdited = false;
   updatePaperCanvasGeometry();
   updateStats();
@@ -416,9 +452,9 @@ function getCurrentMarkdown() {
     let md = editor.storage.markdown.getMarkdown();
     // Normalize tight task lists (prevent tiptap-markdown from inserting loose \n\n between task items)
     md = md.replace(/(- \[[ xX]\] [^\n]+)\n\n(?=- \[[ xX]\])/g, '$1\n');
-    return md;
+    return normalizeBoldSpacing(md);
   }
-  return rawTextarea.value;
+  return normalizeBoldSpacing(rawTextarea.value || '');
 }
 
 /**
@@ -437,13 +473,15 @@ function switchMode(mode) {
   if (mode === currentMode) return;
 
   if (mode === 'raw') {
-    rawTextarea.value = editor.storage.markdown.getMarkdown();
+    rawTextarea.value = getCurrentMarkdown();
     tiptapContainer.style.display = 'none';
     rawTextarea.style.display = 'block';
     modeRaw.classList.add('active');
     modeVisual.classList.remove('active');
   } else {
-    editor.commands.setContent(rawTextarea.value);
+    const clean = normalizeBoldSpacing(rawTextarea.value);
+    rawTextarea.value = clean;
+    editor.commands.setContent(clean);
     rawTextarea.style.display = 'none';
     tiptapContainer.style.display = 'block';
     modeVisual.classList.add('active');
@@ -484,6 +522,9 @@ function applyLocalization(lang) {
   modeVisual.textContent = t.visualMode;
   modeRaw.textContent = t.rawMode;
   exportBtnText.textContent = t.exportBtn;
+  if (printBtnText) {
+    printBtnText.textContent = t.printBtn || (lang === 'ja' ? '印刷' : lang === 'zh-CN' ? '打印' : 'Print');
+  }
 
   // Update theme option labels
   themeSelect.options[0].textContent = t.themes.clean;
@@ -505,6 +546,10 @@ function applyLocalization(lang) {
   if (sheetLangLabel) sheetLangLabel.textContent = lang === 'ja' ? '表示言語' : lang === 'zh-CN' ? '界面语言' : 'Language';
   if (sheetSampleLabel) sheetSampleLabel.textContent = lang === 'ja' ? 'サンプル' : lang === 'zh-CN' ? '示例文档' : 'Sample';
   if (sheetBtnSample) sheetBtnSample.textContent = t.loadSample;
+  if (sheetPrintLabel) sheetPrintLabel.textContent = t.printBtn || (lang === 'ja' ? '印刷' : lang === 'zh-CN' ? '打印' : 'Print');
+  if (sheetBtnPrint) {
+    sheetBtnPrint.textContent = lang === 'ja' ? 'ブラウザから印刷 (Print)' : lang === 'zh-CN' ? '浏览器直接打印 (Print)' : 'Print from Browser';
+  }
 
   if (sheetThemeSelect && sheetThemeSelect.options.length >= 3) {
     sheetThemeSelect.options[0].textContent = t.themes.clean;
@@ -693,6 +738,72 @@ async function handleExportPDF() {
   }
 }
 
+/**
+ * Direct Browser Print Action (Fallback when server is unavailable)
+ */
+function handlePrint() {
+  const markdown = getCurrentMarkdown().trim();
+  const t = translations[currentLang];
+
+  if (!markdown) {
+    showToast(t.emptyWarning, 'error');
+    return;
+  }
+
+  // Ensure print orientation and page size matches current setup
+  updatePrintOrientation();
+
+  // If mobile bottom sheet is open, close it
+  if (spBottomSheet && spBottomSheet.classList.contains('is-open')) {
+    if (drawerBackdrop) drawerBackdrop.classList.remove('is-open');
+    spBottomSheet.classList.remove('is-open');
+  }
+
+  // If in raw markdown mode, temporarily sync content to visual editor
+  const wasRaw = (currentMode === 'raw');
+  if (wasRaw) {
+    const clean = normalizeBoldSpacing(rawTextarea.value);
+    rawTextarea.value = clean;
+    isProgrammatic = true;
+    editor.commands.setContent(clean);
+    tiptapContainer.style.display = 'block';
+    rawTextarea.style.display = 'none';
+    setTimeout(() => { isProgrammatic = false; }, 50);
+  }
+
+  // Trigger native browser print dialog
+  window.print();
+
+  if (wasRaw) {
+    tiptapContainer.style.display = 'none';
+    rawTextarea.style.display = 'block';
+  }
+}
+
+// Ensure correct print behavior when user triggers print via Cmd/Ctrl + P
+let printWasRaw = false;
+window.addEventListener('beforeprint', () => {
+  updatePrintOrientation();
+  if (currentMode === 'raw') {
+    printWasRaw = true;
+    const clean = normalizeBoldSpacing(rawTextarea.value);
+    rawTextarea.value = clean;
+    isProgrammatic = true;
+    editor.commands.setContent(clean);
+    tiptapContainer.style.display = 'block';
+    rawTextarea.style.display = 'none';
+  }
+});
+
+window.addEventListener('afterprint', () => {
+  if (printWasRaw) {
+    printWasRaw = false;
+    tiptapContainer.style.display = 'none';
+    rawTextarea.style.display = 'block';
+    isProgrammatic = false;
+  }
+});
+
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
   initEditor();
@@ -759,6 +870,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Export PDF Button
   btnExport.addEventListener('click', handleExportPDF);
+
+  // Direct Browser Print Button
+  if (btnPrint) {
+    btnPrint.addEventListener('click', handlePrint);
+  }
+  if (sheetBtnPrint) {
+    sheetBtnPrint.addEventListener('click', handlePrint);
+  }
 
   // Setup Mobile Bottom Sheet Drawer
   function toggleBottomSheet(open) {

@@ -190,6 +190,32 @@ async function testWebStudioE2E() {
     assert.ok(modeSwitchSuccess, 'Switching between Visual and Raw modes should work and sync content');
     console.log('    ✔ Visual <-> Raw Markdown synchronization verified');
 
+    // Test 7b: CJK Bold with brackets normalization in TipTap
+    console.log('  ▶ Test 3.7b: Verify CJK bold emphasis with brackets auto-converts to <strong>');
+    const cjkBoldWebSuccess = await page.evaluate(() => {
+      const modeRaw = document.getElementById('mode-raw');
+      const modeVisual = document.getElementById('mode-visual');
+      const textarea = document.getElementById('raw-markdown-editor');
+      const tiptap = document.getElementById('tiptap-container');
+
+      const prevContent = textarea.value;
+      modeRaw.click();
+      textarea.value = '漏水調査の直前に**「予防保全として漏水調査を実施していますか？（はい/いいえ）」**とヒアリング。';
+      modeVisual.click();
+
+      const strongEl = tiptap.querySelector('strong');
+      const hasStrong = !!strongEl && strongEl.textContent.includes('予防保全として漏水調査を実施していますか？');
+
+      // Restore document for subsequent pagination tests
+      modeRaw.click();
+      textarea.value = prevContent;
+      modeVisual.click();
+
+      return hasStrong;
+    });
+    assert.ok(cjkBoldWebSuccess, 'CJK bold with brackets in raw textarea must parse into <strong> in TipTap visual mode');
+    console.log('    ✔ CJK bold with brackets verified in TipTap visual mode (rendered as <strong>)');
+
     // Test 8: Proof of Work Functionality
     console.log('  ▶ Test 3.8: Verify Proof of Work (PoW) computation');
     const powResult = await page.evaluate(async () => {
@@ -646,6 +672,44 @@ async function testWebStudioE2E() {
       `Expected Japanese sample document to be cleanly formatted into exactly 2 pages, got ${directVerifiedPdf.pageCount}`
     );
     console.log(`    ✔ Physical PDF Stream Asserted: Web UI (${directExportData.webPages} pages) === Physical PDF Stream (${directVerifiedPdf.pageCount} pages, ${directVerifiedPdf.byteSize} bytes)`);
+
+    // Test 15: Native Browser Print Layout and Auxiliary Line Invisibility
+    console.log('  ▶ Test 3.15: Native Browser Print Multi-Page & Page Break Line Invisibility');
+    await page.emulateMediaType('print');
+    const printStyles = await page.evaluate(() => {
+      const header = document.querySelector('.studio-header');
+      const btnPrint = document.querySelector('.btn-print');
+      const pageBreakNode = document.querySelector('.page-break-node');
+      const pageBreakPill = document.querySelector('.page-break-pill');
+      const app = document.querySelector('#app');
+      
+      const comp = (el) => el ? window.getComputedStyle(el) : null;
+      return {
+        headerDisplay: comp(header)?.display,
+        btnPrintDisplay: comp(btnPrint)?.display,
+        appOverflow: comp(app)?.overflow,
+        pageBreakDisplay: comp(pageBreakNode)?.display,
+        pageBreakBorderTop: comp(pageBreakNode)?.borderTopStyle,
+        pageBreakBorderWidth: comp(pageBreakNode)?.borderTopWidth,
+        pageBreakHeight: comp(pageBreakNode)?.height,
+        pillDisplay: comp(pageBreakPill)?.display
+      };
+    });
+
+    assert.strictEqual(printStyles.headerDisplay, 'none', 'Studio header must be hidden in print mode');
+    assert.strictEqual(printStyles.btnPrintDisplay, 'none', 'Print button must be hidden in print mode');
+    assert.strictEqual(printStyles.pageBreakBorderTop, 'none', 'Page break node dashed line must be completely invisible (border-top-style: none) in print');
+    assert.strictEqual(printStyles.pageBreakBorderWidth, '0px', 'Page break node border width must be 0px in print');
+    assert.strictEqual(printStyles.pillDisplay, 'none', 'Page break pill badge must be hidden in print');
+    assert.ok(printStyles.appOverflow !== 'hidden', '#app overflow must not be hidden in print');
+    
+    // Generate native print PDF from Web Studio DOM
+    const printPdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
+    const printVerifiedPdf = await verifyPdf(printPdfBuffer);
+    assert.strictEqual(printVerifiedPdf.pageCount, 2, 'Browser print of sample document must produce exactly 2 pages');
+    assert.ok(!printVerifiedPdf.text.includes('Page Break ·'), 'Printed PDF must NOT leak Page Break pill text');
+    console.log(`    ✔ Native Browser Print Asserted: Header & Buttons hidden, Page Break dashed border 0px/none, 2 full pages generated!`);
+    await page.emulateMediaType('screen');
 
   } finally {
     if (browser) await browser.close();

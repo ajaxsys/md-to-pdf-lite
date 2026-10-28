@@ -88,6 +88,14 @@
           </svg>
         </button>
 
+        <!-- Direct Browser Print / Fallback CTA -->
+        <button id="btn-print" class="btn-print" type="button" title="Print document directly from browser (Cmd/Ctrl + P) · 印刷">
+          <svg class="icon-print" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M4 1.75C4 .784 4.784 0 5.75 0h4.5C11.216 0 12 .784 12 1.75V3h1.75C14.992 3 16 4.008 16 5.25v4.5C16 10.992 14.992 12 13.75 12H12v2.25c0 .966-.784 1.75-1.75 1.75h-4.5A1.75 1.75 0 0 1 4 14.25V12H2.25A1.75 1.75 0 0 1 .5 10.25v-4.5C.5 4.008 1.508 3 2.75 3H4V1.75Zm1.5 0V3h5V1.75a.25.25 0 0 0-.25-.25h-4.5a.25.25 0 0 0-.25.25Zm0 10.5v2c0 .138.112.25.25.25h4.5a.25.25 0 0 0 .25-.25v-2h-5ZM2.75 4.5c-.414 0-.75.336-.75.75v4.5c0 .414.336.75.75.75H4v-1.25c0-.966.784-1.75 1.75-1.75h4.5c.966 0 1.75.784 1.75 1.75V10.5h1.25c.414 0 .75-.336.75-.75v-4.5c0-.414-.336-.75-.75-.75H2.75Zm8.5 2.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"></path>
+          </svg>
+          <span id="print-btn-text">印刷</span>
+        </button>
+
         <!-- Export PDF Main CTA -->
         <button id="btn-export-pdf" class="btn-export" type="button">
           <svg class="icon-download" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
@@ -260,6 +268,12 @@
           <span class="sheet-label" id="sheet-sample-label">Sample</span>
           <button id="sheet-btn-sample" class="sheet-control sheet-action-btn" type="button">
             Load Sample Template
+          </button>
+        </div>
+        <div class="sheet-row">
+          <span class="sheet-label" id="sheet-print-label">Print</span>
+          <button id="sheet-btn-print" class="sheet-control sheet-action-btn" type="button">
+            Print / 印刷 (Browser)
           </button>
         </div>
       </div>

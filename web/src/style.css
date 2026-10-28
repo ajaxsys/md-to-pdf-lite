@@ -314,6 +314,31 @@ body {
   color: var(--fg-default);
 }
 
+/* Secondary Print CTA (Direct Browser Print & Fallback) */
+.btn-print {
+  height: 30px;
+  padding: 0 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-default);
+  color: var(--fg-default);
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+.btn-print:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-muted);
+}
+.btn-print:active {
+  background: var(--bg-active);
+}
+
 /* Primary Export CTA (Crisp, High-Contrast, Zero Neon Glow) */
 .btn-export {
   height: 30px;
@@ -1109,20 +1134,20 @@ body {
 /* TipTap Custom Page Break Node (Real in-flow editable block) */
 .page-break-node,
 .page-break-node.page-guide-marker {
-  position: relative !important;
-  left: auto !important;
-  right: auto !important;
-  top: auto !important;
-  margin: 32px 0 20px !important;
-  border-top: 1.5px dashed var(--accent-border) !important;
-  display: flex !important;
-  justify-content: center !important;
-  user-select: none !important;
-  cursor: grab !important;
-  pointer-events: auto !important;
-  touch-action: pan-y !important;
+  position: relative;
+  left: auto;
+  right: auto;
+  top: auto;
+  margin: 32px 0 20px;
+  border-top: 1.5px dashed var(--accent-border);
+  display: flex;
+  justify-content: center;
+  user-select: none;
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: pan-y;
   transition: all 0.15s ease;
-  z-index: 15 !important;
+  z-index: 15;
 }
 
 .page-break-node.is-touch-dragging {
@@ -1623,5 +1648,169 @@ body {
 
   .footer-info #footer-status-text {
     display: none !important; /* Hide redundant verbose text on mobile */
+  }
+}
+
+/* ==========================================================================
+   Print and Native PDF Generation Styles (@media print)
+   ========================================================================== */
+@media print {
+  @page {
+    margin: 15mm 12mm;
+    size: auto;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #1f2328 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide app chrome, toolbars, overlays, and helpers */
+  .studio-header,
+  header,
+  .editor-toolbar,
+  .studio-footer,
+  footer,
+  .floating-page-pill,
+  .drawer-backdrop,
+  .sp-bottom-sheet,
+  aside,
+  .toast-notification,
+  .toolbar-overflow-fade,
+  .page-guides-overlay,
+  .page-guides-overlay *,
+  .page-break-line,
+  .page-guide-marker.auto-break,
+  .page-guide-line,
+  .page-guide-badge,
+  .virtual-page-break,
+  .page-break-pill,
+  .page-break-actions,
+  .page-break-icon,
+  .page-break-title,
+  #pagination-measurement-sandbox,
+  .raw-markdown-surface,
+  .btn-print,
+  .btn-export,
+  .btn-theme-mode {
+    display: none !important;
+  }
+
+  #app,
+  .app-layout {
+    display: block !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    position: static !important;
+  }
+
+  .editor-workspace {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    position: static !important;
+  }
+
+  .editor-surface {
+    display: block !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    background: #ffffff !important;
+  }
+
+  /* Page break rules matching src/styles/print.css - Ensure complete visual invisibility in print */
+  .page-break,
+  .page-break-node,
+  .page-break-node.page-guide-marker,
+  .page-break.page-guide-marker,
+  .editor-surface .page-break-node,
+  div.page-break-node,
+  div[data-type="page-break"],
+  [data-type="page-break"] {
+    page-break-before: always !important;
+    break-before: page !important;
+    display: block !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  .page-break-node *,
+  .page-break * {
+    display: none !important;
+    visibility: hidden !important;
+    border: none !important;
+    border-top: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .page-break-after {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  table {
+    width: 100% !important;
+    max-width: 100% !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  tr, pre, blockquote, .katex-display, .mermaid, .contains-task-list, ul.task-list {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  li {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  img {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    max-height: 95vh;
   }
 }
