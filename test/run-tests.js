@@ -56,7 +56,14 @@ Page 2 content.
   assert.ok(darkHtml.includes('class="hljs code-theme-dark"'), 'Should support :dark suffix');
   assert.ok(darkHtml.includes('data-theme="dark"'), 'Should add data-theme="dark" attribute');
 
-  console.log('  ✔ Parser correctly handles tables, code, KaTeX, Mermaid, page breaks, and code block immunity');
+  // Verify CJK bold emphasis spacing normalization (e.g. 直前に**「重要」**)
+  const cjkBoldMd = '漏水調査の直前に**「予防保全として漏水調査を実施していますか？（はい/いいえ）」**\n\n直前に**【重要項目】**です。\n\nコード: `const x = a ** b;`';
+  const cjkBoldHtml = parseMarkdown(cjkBoldMd);
+  assert.ok(cjkBoldHtml.includes('<strong>「予防保全として漏水調査を実施していますか？（はい/いいえ）」</strong>'), 'CJK bold with open/close brackets must render as <strong>');
+  assert.ok(cjkBoldHtml.includes('<strong>【重要項目】</strong>'), 'CJK bold with brackets must render as <strong>');
+  assert.ok(cjkBoldHtml.includes('<code>const x = a ** b;</code>'), 'Code block with ** must not be modified');
+
+  console.log('  ✔ Parser correctly handles tables, code, KaTeX, Mermaid, page breaks, code immunity, and CJK bold typography');
 
   const { verifyPdf } = require('./pdf-verifier');
 

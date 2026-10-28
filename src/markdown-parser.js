@@ -113,29 +113,74 @@ function createParser() {
 }
 
 /**
+ * Automatically normalizes whitespace around bold (**...**) and bold-italic (***...***) syntax
+ * to overcome CommonMark punctuation-flanking delimiter limitations in CJK (e.g. 直前に**「重要」**).
+ * Preserves code blocks, inline code, math expressions, and markdown links/images.
+ */
+function normalizeBoldSpacing(markdown) {
+  if (!markdown || typeof markdown !== 'string') return markdown;
+
+  // Mask code blocks, inline code, display math, inline math, HTML tags, and link destinations
+  const tokens = [];
+  const maskRegex = /(```[\s\S]*?```|~~~[\s\S]*?~~~|`+[^`\n]+`+|\$\$[\s\S]*?\$\$|\$[^\$\n]+\$|<[^>]+>|!?\[[^\]]*\]\([^)]+\))/g;
+
+  const masked = markdown.replace(maskRegex, (match) => {
+    const placeholder = `__MD2PDF_MASK_TOKEN_${tokens.length}__`;
+    tokens.push(match);
+    return placeholder;
+  });
+
+  // Match pairs of ** or ***
+  const boldRegex = /(\*{2,3})(?!\s)((?:[^\n*]|\*(?!\*))+?)(?<!\s)\1/g;
+
+  const processed = masked.replace(boldRegex, (match, stars, content, offset, str) => {
+    const before = offset > 0 ? str[offset - 1] : '';
+    const after = offset + match.length < str.length ? str[offset + match.length] : '';
+
+    // Add space before opening delimiter if preceded by non-whitespace and not an opening bracket/quote/delimiter
+    const needSpaceBefore = before && !/\s/.test(before) && !/[#*_~`([{<「『【（《“‘]/.test(before);
+
+    // Add space after closing delimiter if followed by non-whitespace and not a closing bracket/quote/punctuation
+    const needSpaceAfter = after && !/\s/.test(after) && !/[*_~`.)}\]>」』】）》”’，。！？；：、,.:;!?]/.test(after);
+
+    let res = '';
+    if (needSpaceBefore) res += ' ';
+    res += `${stars}${content}${stars}`;
+    if (needSpaceAfter) res += ' ';
+    return res;
+  });
+
+  return processed.replace(/__MD2PDF_MASK_TOKEN_(\d+)__/g, (_, idx) => tokens[Number(idx)]);
+}
+
+/**
  * Preprocesses markdown text for convenient syntax extensions:
+ * - Automatically normalizes CJK bold/emphasis spacing
  * - <!-- pagebreak --> or <!-- page-break --> -> <div class="page-break"></div>
  * - ---pagebreak--- or ---break--- -> <div class="page-break"></div>
  */
 function preprocessMarkdown(text) {
   if (!text) return '';
 
-  // Protect code blocks and inline code from accidental page break replacement
+  // 1. Normalize CJK bold spacing to ensure proper CommonMark delimiter parsing
+  const normalized = normalizeBoldSpacing(text);
+
+  // 2. Protect code blocks and inline code from accidental page break replacement
   const codeTokens = [];
   // Match fenced code blocks (```...``` or ~~~...~~~) and inline code (`...`)
   const codeRegex = /(```[\s\S]*?```|~~~[\s\S]*?~~~|`+[^`\n]+`+)/g;
-  const masked = text.replace(codeRegex, (match) => {
+  const masked = normalized.replace(codeRegex, (match) => {
     const token = `__MD2PDF_CODE_TOKEN_${codeTokens.length}__`;
     codeTokens.push(match);
     return token;
   });
 
-  // Safely replace standalone pagebreak markers in markdown prose
+  // 3. Safely replace standalone pagebreak markers in markdown prose
   let processed = masked.replace(/<!--\s*page[-_]?break\s*-->/gi, '<div class="page-break"></div>');
   processed = processed.replace(/^---pagebreak---\s*$/gim, '<div class="page-break"></div>');
   processed = processed.replace(/^---break---\s*$/gim, '<div class="page-break"></div>');
 
-  // Restore protected code blocks and inline code spans
+  // 4. Restore protected code blocks and inline code spans
   processed = processed.replace(/__MD2PDF_CODE_TOKEN_(\d+)__/g, (_, idx) => {
     return codeTokens[Number(idx)];
   });
@@ -167,5 +212,6 @@ module.exports = {
   createParser,
   preprocessMarkdown,
   parseMarkdown,
+  normalizeBoldSpacing,
   inlineAllLocalImages
 };

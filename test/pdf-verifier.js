@@ -60,9 +60,10 @@ async function verifyPdf(pdfInput, expectations = {}) {
   if (Array.isArray(expectations.mustContain)) {
     const compactText = text.replace(/\s+/g, ' ');
     for (const expectedStr of expectations.mustContain) {
-      const compactExpected = expectedStr.replace(/\s+/g, ' ');
+      const normExpected = expectedStr.normalize('NFKC');
+      const compactExpected = normExpected.replace(/\s+/g, ' ');
       assert.ok(
-        text.includes(expectedStr) || compactText.includes(compactExpected),
+        text.includes(expectedStr) || text.includes(normExpected) || compactText.includes(compactExpected),
         `PDF verification failed: missing expected text "${expectedStr}" in PDF output`
       );
     }

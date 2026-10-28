@@ -146,6 +146,18 @@ All should remain on page 1.
   assert.strictEqual(immunityVer.pageCount, 1, 'Code with pagebreak directives must not split page');
   console.log('    ✔ False page break immunity verified in code blocks & inline backticks');
 
+  // Test 8: CJK Bold with punctuation brackets (e.g. 直前に**「予防保全...」**)
+  console.log('  ▶ Test 1.8: Verify CJK bold emphasis with punctuation brackets parses into strong in PDF');
+  const cjkBoldTestMd = '# 漏水調査報告\n\n漏水調査の直前に**「予防保全として漏水調査を実施していますか？（はい/いいえ）」**とヒアリングを実施。';
+  const cjkBoldRes = await convert({ markdown: cjkBoldTestMd, format: 'A4' });
+  const cjkBoldVer = await verifyPdf(cjkBoldRes.buffer, {
+    exactPages: 1,
+    mustContain: ['漏水調査報告', '予防保全として漏水調査を実施していますか？'],
+    mustNotContain: ['**']
+  });
+  assert.strictEqual(cjkBoldVer.pageCount, 1);
+  console.log('    ✔ CJK bold with brackets properly converted to PDF vector text');
+
   console.log('  ✨ All PDF compilation E2E tests passed successfully!\n');
 }
 
