@@ -110,3 +110,11 @@ When you (the AI agent) need to generate temporary artifacts—such as:
 **Always place them inside `.agent/tmp/`** (or `.agent/` subdirectories) rather than cluttering the repository root.
 - `.agent/` is configured in `.gitignore` (except `.agent/tmp/.gitkeep` if tracked, or completely ignored) so temporary test files will never pollute `git status` or accidental commits.
 - Clean up large temporary PDFs/HTMLs in `.agent/tmp/` once your verification task is complete.
+
+---
+
+## 6. Open-Source Security (CRITICAL)
+
+> [!CAUTION]
+> **This repository is 100% public open-source.**
+> Never hardcode, commit, or leak any real/private cloud account IDs, S3 bucket names, credentials, keys, or proprietary configs into tracked files. All private deployment parameters must strictly reside in `.env` (gitignored).
