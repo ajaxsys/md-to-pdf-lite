@@ -254,10 +254,14 @@ jobs:
 | :--- | :--- | :--- | :--- |
 | `-o, --output` | `output` | `[原文件名].pdf` | 输出 PDF 路径或目标文件夹 |
 | `-f, --format` | `format` | `'A4'` | 纸张规格 (`A4`, `Letter`, `A3`, `Legal` 等) |
+| `-t, --theme` | `theme` | `'github'` | 内置排版主题 (`github`, `clean`, `corporate-ja`) |
 | `-l, --landscape` | `landscape` | `false` | 是否横向打印 |
 | `-s, --stylesheet` | `stylesheet` | `undefined` | 自定义外部 CSS 样式表路径 |
 | `-c, --css` | `css` | `undefined` | 自定义内联 CSS 字符串 |
+| `--title` | `title` | `undefined` | 自定义生成的 PDF 文档标题 |
+| `--tagged` | `tagged` | `false` | 生成带辅助功能标签的 PDF |
 | `--chrome` | `executablePath` | *自动嗅探* | 指定 Chrome/Chromium 二进制程序路径 |
+| `--check-env` | — | — | 诊断本机 Chrome 与中日韩字体环境 |
 
 ---
 

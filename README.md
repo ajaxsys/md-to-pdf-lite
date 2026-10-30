@@ -252,10 +252,14 @@ jobs:
 | :--- | :--- | :--- | :--- |
 | `-o, --output` | `output` | `[name].pdf` | Output PDF file path or target directory |
 | `-f, --format` | `format` | `'A4'` | Paper format (`A4`, `Letter`, `A3`, `Legal`, etc.) |
+| `-t, --theme` | `theme` | `'github'` | Built-in theme (`github`, `clean`, `corporate-ja`) |
 | `-l, --landscape` | `landscape` | `false` | Enable landscape orientation |
 | `-s, --stylesheet` | `stylesheet` | `undefined` | Path to custom external CSS file |
 | `-c, --css` | `css` | `undefined` | Custom inline CSS string |
+| `--title` | `title` | `undefined` | Custom PDF document title |
+| `--tagged` | `tagged` | `false` | Generate tagged accessible PDF |
 | `--chrome` | `executablePath` | *Auto-detected* | Custom Chrome/Chromium executable path |
+| `--check-env` | — | — | Diagnostic check for local Chrome & fonts |
 
 ---
 

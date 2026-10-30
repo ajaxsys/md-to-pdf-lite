@@ -254,10 +254,14 @@ jobs:
 | :--- | :--- | :--- | :--- |
 | `-o, --output` | `output` | `[元の名前].pdf` | 出力先 PDF パスまたは保存先ディレクトリ |
 | `-f, --format` | `format` | `'A4'` | 用紙サイズ (`A4`, `Letter`, `A3`, `Legal` 等) |
+| `-t, --theme` | `theme` | `'github'` | 組み込みデザインテーマ (`github`, `clean`, `corporate-ja`) |
 | `-l, --landscape` | `landscape` | `false` | 横向きレイアウトを有効化 |
 | `-s, --stylesheet` | `stylesheet` | `undefined` | 外部 CSS ファイルのパス |
 | `-c, --css` | `css` | `undefined` | インライン CSS 文字列 |
+| `--title` | `title` | `undefined` | 生成される PDF ドキュメントのタイトル指定 |
+| `--tagged` | `tagged` | `false` | アクセシビリティタグ付き PDF の生成 |
 | `--chrome` | `executablePath` | *自動検出* | 使用する Chrome/Chromium の実行パス |
+| `--check-env` | — | — | ローカル Chrome および CJK フォントの診断実行 |
 
 ---
 

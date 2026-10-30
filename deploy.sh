@@ -33,15 +33,17 @@ pulumi stack select "${PULUMI_STACK:-dev}" 2>/dev/null || true
 pulumi up --yes
 
 # 3. Synchronize S3 static assets with explicit Cache-Control headers
-BUCKET_NAME=$(pulumi stack output webUiBucketName 2>/dev/null || echo "md-to-pdf-web-bucket-5178c71")
+BUCKET_NAME=$(pulumi stack output webUiBucketName 2>/dev/null || echo "${S3_WEB_BUCKET_NAME:-}")
 if [ -n "${BUCKET_NAME}" ]; then
-  echo "📦 Syncing static assets to S3 with cache-control..."
+  echo "📦 Syncing static assets to S3 with cache-control (${BUCKET_NAME})..."
   aws s3 sync "${ROOT_DIR}/web/dist/assets" "s3://${BUCKET_NAME}/assets" \
     --cache-control "public, max-age=31536000, immutable" \
     --delete
   aws s3 cp "${ROOT_DIR}/web/dist/index.html" "s3://${BUCKET_NAME}/index.html" \
     --cache-control "max-age=0, no-cache, no-store, must-revalidate" \
     --content-type "text/html"
+else
+  echo "⚠️ webUiBucketName not detected from Pulumi stack output. Skipping static asset sync."
 fi
 
 # 4. Invalidate CloudFront Cache
