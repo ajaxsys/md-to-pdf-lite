@@ -806,6 +806,34 @@ window.addEventListener('afterprint', () => {
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
+  // Restore saved theme and page setup preferences
+  const VALID_THEMES = ['clean', 'corporate-ja', 'github'];
+  const savedTheme = localStorage.getItem('md2pdf_theme');
+  if (savedTheme && VALID_THEMES.includes(savedTheme)) {
+    if (themeSelect) themeSelect.value = savedTheme;
+    if (sheetThemeSelect) sheetThemeSelect.value = savedTheme;
+  }
+
+  const VALID_FORMATS = ['A4', 'Letter', 'A3', 'Legal'];
+  const savedFormat = localStorage.getItem('md2pdf_format');
+  if (savedFormat && VALID_FORMATS.includes(savedFormat)) {
+    if (formatSelect) formatSelect.value = savedFormat;
+    if (sheetFormatSelect) sheetFormatSelect.value = savedFormat;
+  }
+
+  const savedOrientation = localStorage.getItem('md2pdf_orientation');
+  if (savedOrientation === 'landscape') {
+    isLandscape = true;
+  } else if (savedOrientation === 'portrait') {
+    isLandscape = false;
+  }
+
+  // Pre-apply theme class before editor initialization for accurate 1:1 pagination geometry
+  if (tiptapContainer && themeSelect) {
+    tiptapContainer.classList.remove('theme-clean', 'theme-corporate-ja', 'theme-github');
+    tiptapContainer.classList.add(`theme-${themeSelect.value}`);
+  }
+
   initEditor();
   setupToolbar();
   setupEditorObservers();
@@ -840,6 +868,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!tiptapContainer) return;
     tiptapContainer.classList.remove('theme-clean', 'theme-corporate-ja', 'theme-github');
     tiptapContainer.classList.add(`theme-${theme}`);
+    if (VALID_THEMES.includes(theme)) {
+      try {
+        localStorage.setItem('md2pdf_theme', theme);
+      } catch (_) {}
+    }
     updateStats();
   }
 
@@ -849,15 +882,27 @@ document.addEventListener('DOMContentLoaded', () => {
   updateThemeClass(themeSelect.value);
 
   // Paper Format Select Handler
-  formatSelect.addEventListener('change', () => {
+  formatSelect.addEventListener('change', (e) => {
+    if (VALID_FORMATS.includes(e.target.value)) {
+      try {
+        localStorage.setItem('md2pdf_format', e.target.value);
+      } catch (_) {}
+    }
     updatePaperCanvasGeometry();
     updateStats();
   });
 
   // Orientation Toggle Handler
   const orientationIcon = document.getElementById('orientation-icon');
+  if (orientationIcon && isLandscape) {
+    orientationIcon.classList.add('is-landscape');
+  }
+
   orientationToggle.addEventListener('click', () => {
     isLandscape = !isLandscape;
+    try {
+      localStorage.setItem('md2pdf_orientation', isLandscape ? 'landscape' : 'portrait');
+    } catch (_) {}
     const t = translations[currentLang];
     orientationText.textContent = isLandscape ? t.landscape : t.portrait;
     if (orientationIcon) {

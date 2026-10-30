@@ -711,6 +711,53 @@ async function testWebStudioE2E() {
     console.log(`    ✔ Native Browser Print Asserted: Header & Buttons hidden, Page Break dashed border 0px/none, 2 full pages generated!`);
     await page.emulateMediaType('screen');
 
+    // Test 16: Theme & Page Setup Selection Persistence across page reloads
+    console.log('  ▶ Test 3.16: Verify Theme & Page Setup Selection Persistence (localStorage & Reload)');
+    
+    // Select corporate-ja theme
+    await page.evaluate(() => {
+      const select = document.getElementById('theme-select');
+      select.value = 'corporate-ja';
+      select.dispatchEvent(new Event('change'));
+    });
+    await new Promise(r => setTimeout(r, 200));
+
+    const themeAfterChange = await page.evaluate(() => {
+      const select = document.getElementById('theme-select');
+      const container = document.getElementById('tiptap-container');
+      const stored = localStorage.getItem('md2pdf_theme');
+      return {
+        selectVal: select?.value,
+        hasThemeClass: container?.classList.contains('theme-corporate-ja'),
+        storedVal: stored
+      };
+    });
+    assert.strictEqual(themeAfterChange.selectVal, 'corporate-ja');
+    assert.ok(themeAfterChange.hasThemeClass, 'Container must have theme-corporate-ja class');
+    assert.strictEqual(themeAfterChange.storedVal, 'corporate-ja', 'localStorage must record corporate-ja');
+
+    // Reload the page and verify theme preference is restored
+    await page.reload({ waitUntil: 'networkidle0' });
+    await page.waitForSelector('.tiptap', { timeout: 8000 });
+
+    const themeAfterReload = await page.evaluate(() => {
+      const select = document.getElementById('theme-select');
+      const sheetSelect = document.getElementById('sheet-theme-select');
+      const container = document.getElementById('tiptap-container');
+      const badge = document.getElementById('sp-summary-badge');
+      return {
+        selectVal: select?.value,
+        sheetVal: sheetSelect?.value,
+        hasThemeClass: container?.classList.contains('theme-corporate-ja'),
+        badgeText: badge?.textContent
+      };
+    });
+    assert.strictEqual(themeAfterReload.selectVal, 'corporate-ja', 'theme-select must restore corporate-ja after reload');
+    assert.strictEqual(themeAfterReload.sheetVal, 'corporate-ja', 'sheet-theme-select must restore corporate-ja after reload');
+    assert.ok(themeAfterReload.hasThemeClass, 'Container must retain theme-corporate-ja class after reload');
+    assert.ok(themeAfterReload.badgeText.includes('Corporate'), 'SP badge must reflect Corporate theme');
+    console.log('    ✔ Theme preference persistence across reload verified (corporate-ja restored cleanly)');
+
   } finally {
     if (browser) await browser.close();
     server.close();
@@ -722,8 +769,10 @@ async function testWebStudioE2E() {
 module.exports = { testWebStudioE2E };
 
 if (require.main === module) {
-  testWebStudioE2E().catch(err => {
-    console.error('❌ Web Studio E2E Test Suite failed:', err);
-    process.exit(1);
-  });
+  testWebStudioE2E()
+    .then(() => process.exit(0))
+    .catch(err => {
+      console.error('❌ Web Studio E2E Test Suite failed:', err);
+      process.exit(1);
+    });
 }

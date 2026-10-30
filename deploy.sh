@@ -12,10 +12,23 @@ echo "📦 [1/2] Building Web Frontend assets..."
 cd "${ROOT_DIR}/web"
 npm run build
 
+# Load local .env if present (never committed to git)
+if [ -f "${ROOT_DIR}/.env" ]; then
+  set -a
+  source "${ROOT_DIR}/.env"
+  set +a
+fi
+
 cd "${ROOT_DIR}/infra"
 # Automatically bridge AWS CLI login credentials to Pulumi
 eval "$(aws configure export-credentials --format env)"
 export PULUMI_CONFIG_PASSPHRASE=""
+
+# If custom S3/self-hosted backend is configured in .env, connect to it
+if [ -n "${PULUMI_BACKEND_URL:-}" ]; then
+  pulumi login "${PULUMI_BACKEND_URL}"
+fi
+pulumi stack select "${PULUMI_STACK:-dev}" 2>/dev/null || true
 
 pulumi up --yes
 
